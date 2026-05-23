@@ -1,6 +1,5 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-settings.json",
-  "language": "english",
   "env": {
     "CLAUDE_CODE_NEW_INIT": "1",
     "CLAUDE_CODE_NO_FLICKER": "1"

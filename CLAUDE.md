@@ -4,12 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-A family planning app (Kotlin + Jetpack Compose) for storing routines and plans in one place. Planned features:
-- Calendar with events and reminders
-- To-do list (shared between family members)
-- Shopping list (shared between family members)
-- Family mode — members can see each other's events and lists
-- Voice input — keyword phrases trigger actions without a keyboard (e.g., "Buy sugar 1kg" adds to shopping list)
+A family planning app (Kotlin + Jetpack Compose) for storing routines and plans in one place.
 
 ## Architecture: Feature-Based Package Structure
 

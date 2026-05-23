@@ -8,3 +8,11 @@
 - [ ] Set up GitHub CLI — `winget install GitHub.cli` on Windows; enables PR and issue management from the terminal.
 - [ ] Add a ViewModel + Room skeleton — scaffold one feature end-to-end (e.g., `todo/`) with ViewModel + Room to establish the pattern for all other features.
 - [ ] Consider Firebase for the family-sharing feature — Firestore gives real-time sync across family members' devices without building a backend.
+
+Planned features:
+- Calendar with events and reminders
+- To-do list (shared between family members)
+- Shopping list (shared between family members)
+- Family mode — members can see each other's events and lists
+- Voice input — keyword phrases trigger actions without a keyboard (e.g., "Buy sugar 1kg" adds to shopping list)
+- 
