@@ -1,4 +1,4 @@
-package com.example.scheduler.hello.presentation
+package com.dgero.homly.hello.presentation
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column

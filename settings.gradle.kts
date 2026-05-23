@@ -22,5 +22,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Scheduler"
+rootProject.name = "Homly"
 include(":app")

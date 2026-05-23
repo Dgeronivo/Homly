@@ -1,4 +1,4 @@
-package com.example.scheduler.ui.theme
+package com.dgero.homly.ui.theme
 
 import androidx.compose.ui.graphics.Color
 

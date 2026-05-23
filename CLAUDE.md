@@ -8,7 +8,7 @@ A family planning app (Kotlin + Jetpack Compose) for storing routines and plans 
 
 ## Architecture: Feature-Based Package Structure
 
-Every feature lives in its own directory under `app/src/main/kotlin/com/example/scheduler/`. Do not mix features together.
+Every feature lives in its own directory under `app/src/main/java/com/dgero/homly/`. Do not mix features together.
 
 Each feature follows MVVM with these sub-packages:
 
@@ -21,7 +21,7 @@ feature/
 
 Example layout:
 ```
-com.example.scheduler/
+com.dgero.homly/
 ├── calendar/
 │   ├── presentation/
 │   ├── domain/
@@ -52,7 +52,6 @@ Shared utilities or cross-feature models go in `core/` at the same level.
 - **Build**: `./gradlew build`
 - **Unit tests**: `./gradlew test`
 - **Instrumented tests**: `./gradlew connectedAndroidTest` (requires a connected device or emulator)
-- **Install on device**: `./gradlew installDebug`
 
 ## Dependencies
 

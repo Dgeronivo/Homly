@@ -23,7 +23,7 @@ A family planning app for Android that keeps routines, events, and daily tasks i
 Each feature lives in its own directory:
 
 ```
-com.example.scheduler/
+com.dgero.homly/
 ├── calendar/       # Calendar and events
 ├── todo/           # To-do list
 ├── shopping/       # Shopping list
