@@ -69,12 +69,6 @@ When given a new requirement:
 
 Managed via `gradle/libs.versions.toml` (Version Catalog). Always add new dependencies there, not directly in `build.gradle.kts`.
 
-## Code Quality Criteria
-
-- **Simple and readable** — prefer the most straightforward solution; avoid over-engineering.
-- **SOLID** — follow Single Responsibility, Open/Closed, Liskov Substitution, Interface Segregation, and Dependency Inversion principles.
-- **One purpose per class, function** — every function does exactly one thing and does it clearly.
-
 ## Code Style
 
 - Kotlin with `kotlin.code.style=official` (4-space indentation, standard Kotlin conventions).

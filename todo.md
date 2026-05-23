@@ -1,5 +1,8 @@
 # TODO / Issues / Plans / Debt
 
+- check how see view of screens. Now it is broken.
+- implement auth. Login, pass. Saving in local storage and in backend DB by interfaces and env.
+
 ## Pending
 
 - [ ] Install the skill-creator plugin — `/plugin install skill-creator@claude-plugins-official` lets you create and refine custom skills using evals.
