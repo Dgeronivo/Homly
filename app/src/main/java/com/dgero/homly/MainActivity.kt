@@ -5,32 +5,84 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import com.dgero.homly.hello.presentation.HelloScreen
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import com.dgero.homly.auth.domain.usecase.LogoutUseCase
+import com.dgero.homly.auth.presentation.authGraph
+import com.dgero.homly.home.presentation.HomeScreen
+import com.dgero.homly.home.presentation.HomeViewModel
 import com.dgero.homly.ui.theme.HomlyTheme
+import kotlinx.coroutines.flow.first
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        val container = (application as HomlyApplication).container
         setContent {
             HomlyTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    HelloScreen(modifier = Modifier.padding(innerPadding))
+                Surface(modifier = Modifier.fillMaxSize()) {
+                    AuthGate(container = container)
                 }
             }
         }
     }
 }
 
-@Preview(showBackground = true)
+private sealed interface SessionLoadState {
+    object Loading : SessionLoadState
+    data class Ready(val userId: Long?) : SessionLoadState
+}
+
 @Composable
-fun HelloScreenPreview() {
-    HomlyTheme {
-        HelloScreen()
+private fun AuthGate(container: AppContainer) {
+    var sessionState by remember { mutableStateOf<SessionLoadState>(SessionLoadState.Loading) }
+
+    LaunchedEffect(Unit) {
+        val userId = container.sessionRepository.currentUserId.first()
+        sessionState = SessionLoadState.Ready(userId)
+    }
+
+    when (val state = sessionState) {
+        is SessionLoadState.Loading -> Unit
+        is SessionLoadState.Ready -> {
+            val startDestination = if (state.userId != null) "home" else "auth"
+            val navController = rememberNavController()
+
+            NavHost(navController = navController, startDestination = startDestination) {
+                authGraph(
+                    navController = navController,
+                    userRepository = container.userRepository,
+                    sessionRepository = container.sessionRepository,
+                )
+                composable("home") {
+                    val vm: HomeViewModel = viewModel(
+                        factory = HomeViewModel.Factory(
+                            logoutUseCase = LogoutUseCase(container.sessionRepository),
+                            userRepository = container.userRepository,
+                            sessionRepository = container.sessionRepository,
+                        )
+                    )
+                    HomeScreen(
+                        viewModel = vm,
+                        onLogout = {
+                            navController.navigate("auth") {
+                                popUpTo("home") { inclusive = true }
+                            }
+                        },
+                    )
+                }
+            }
+        }
     }
 }
