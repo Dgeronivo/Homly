@@ -1,6 +1,5 @@
 # TODO / Issues / Plans / Debt
 
-- check how see view of screens. Now it is broken.
 - implement auth. Login, pass. Saving in local storage and in backend DB by interfaces and env.
 
 ## Pending
@@ -18,4 +17,5 @@ Planned features:
 - Shopping list (shared between family members)
 - Family mode — members can see each other's events and lists
 - Voice input — keyword phrases trigger actions without a keyboard (e.g., "Buy sugar 1kg" adds to shopping list)
-- 
+- translations
+- ліцензія, попередження про збереження данних
