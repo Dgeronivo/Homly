@@ -1,12 +1,15 @@
-.PHONY: build test clean rebuild
+.PHONY: build test connected-test clean rebuild
 
 build:
-	./gradlew build
+	gradlew build
 
 test:
-	./gradlew test
+	gradlew test
+
+connected-test:
+	gradlew connectedAndroidTest
 
 clean:
-	./gradlew clean
+	gradlew clean
 
 rebuild: clean build
