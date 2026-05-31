@@ -13,5 +13,9 @@
       "Bash(gradle:*)",
       "Bash(./gradlew:*)"
     ]
+  },
+  "attribution": {
+    "commit": "",
+    "pr": ""
   }
 }
