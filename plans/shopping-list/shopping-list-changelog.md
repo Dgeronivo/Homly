@@ -37,3 +37,21 @@
 - Замість застарілого `fallbackToDestructiveMigration()` використано `fallbackToDestructiveMigration(dropAllTables = true)` — актуальний незадепрекейчений API Room 2.7.1 (та сама семантика).
 
 **Build / review:** `gradlew build` → `BUILD SUCCESSFUL`; unit-тести зелені, androidTest компілюється (виконання — на емуляторі, гейт Ітерації 3). Self-review проти плану → ✅.
+
+---
+
+## Iteration 3 — 2026-06-03 (Presentation + navigation)
+
+**Зроблено:**
+- `shopping/presentation/ShoppingListUiState.kt` — `items`, `sortOrder`, `newItemText`, `isLimitReached`, `errorMessage`.
+- `shopping/presentation/ShoppingListViewModel.kt` — `combine(currentUserId, sortOrder)` + `flatMapLatest` (без stale `userId` при зміні користувача); `sortOrder`/`newItemText`/`errorMessage` як `MutableStateFlow`; `StateFlow<ShoppingListUiState>`; методи `onAdd/onToggle/onEdit/onDelete/onSortChange/onNewItemTextChange`; `Factory`; мапер `shoppingErrorMessage`.
+- `shopping/presentation/ShoppingListScreen.kt` — Material3: рядок додавання (вимкнений на 50 + helper text), перемикач сортування `FilterChip` (Date ⇄ A–Z), `LazyColumn` (чекбокс, `LineThrough` для куплених, tap-to-edit inline, кнопка `✕`), порожній стан, `TopAppBar` із back. Приватний stateless `ShoppingListContent` + два `@Preview`.
+- `MainActivity.kt` — `composable("shopping")` з `ShoppingListViewModel.Factory`; back через `popBackStack`.
+- `HomeScreen.kt` — кнопка «Shopping list» → `navigate("shopping")`.
+- Unit-тести: `ShoppingListViewModelTest` — дефолт `DATE_DESC`, перемикання сортування, `isLimitReached`, реакція на зміну `currentUserId` без витоку, порожній список.
+
+**Відхилення від плану:**
+- Замість векторної іконки видалення використано текст `✕` — у проєкті немає залежності `material-icons`, а план забороняє додавати нові залежності.
+- `make connected-test` не виконано — підключеного емулятора/пристрою немає (`adb devices` порожній). androidTest-джерела компілюються (`compileDebugAndroidTestKotlin` → `BUILD SUCCESSFUL`).
+
+**Build / review:** `gradlew clean build` (= `make rebuild`) → `BUILD SUCCESSFUL`; усі unit-тести зелені; lint чистий. Self-review проти плану → ✅.

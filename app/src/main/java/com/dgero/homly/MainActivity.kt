@@ -21,6 +21,13 @@ import com.dgero.homly.auth.domain.usecase.LogoutUseCase
 import com.dgero.homly.auth.presentation.authGraph
 import com.dgero.homly.home.presentation.HomeScreen
 import com.dgero.homly.home.presentation.HomeViewModel
+import com.dgero.homly.shopping.domain.usecase.AddShoppingItemUseCase
+import com.dgero.homly.shopping.domain.usecase.DeleteShoppingItemUseCase
+import com.dgero.homly.shopping.domain.usecase.EditShoppingItemUseCase
+import com.dgero.homly.shopping.domain.usecase.ObserveShoppingItemsUseCase
+import com.dgero.homly.shopping.domain.usecase.ToggleShoppingItemUseCase
+import com.dgero.homly.shopping.presentation.ShoppingListScreen
+import com.dgero.homly.shopping.presentation.ShoppingListViewModel
 import com.dgero.homly.ui.theme.HomlyTheme
 import kotlinx.coroutines.flow.first
 
@@ -75,11 +82,28 @@ private fun AuthGate(container: AppContainer) {
                     )
                     HomeScreen(
                         viewModel = vm,
+                        onOpenShoppingList = { navController.navigate("shopping") },
                         onLogout = {
                             navController.navigate("auth") {
                                 popUpTo("home") { inclusive = true }
                             }
                         },
+                    )
+                }
+                composable("shopping") {
+                    val vm: ShoppingListViewModel = viewModel(
+                        factory = ShoppingListViewModel.Factory(
+                            observeShoppingItems = ObserveShoppingItemsUseCase(container.shoppingRepository),
+                            addShoppingItem = AddShoppingItemUseCase(container.shoppingRepository),
+                            editShoppingItem = EditShoppingItemUseCase(container.shoppingRepository),
+                            toggleShoppingItem = ToggleShoppingItemUseCase(container.shoppingRepository),
+                            deleteShoppingItem = DeleteShoppingItemUseCase(container.shoppingRepository),
+                            sessionRepository = container.sessionRepository,
+                        )
+                    )
+                    ShoppingListScreen(
+                        viewModel = vm,
+                        onBack = { navController.popBackStack() },
                     )
                 }
             }
