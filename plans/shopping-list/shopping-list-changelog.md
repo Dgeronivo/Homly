@@ -20,3 +20,20 @@
 - Додано `ShoppingError.Unknown` (не в списку плану) — дзеркалить `AuthError.Unknown` для catch-all мапінгу помилок у репозиторії.
 
 **Build / review:** `gradlew build` → `BUILD SUCCESSFUL`; unit-тести зелені. Self-review проти плану → ✅.
+
+---
+
+## Iteration 2 — 2026-06-03 (Data + DB integration)
+
+**Зроблено:**
+- `shopping/data/local/ShoppingItemEntity.kt` — таблиця `shopping_items`, `@PrimaryKey(autoGenerate)`, `Index("userId")`, дефолти `isBought=false`, `createdAt`.
+- `shopping/data/local/ShoppingItemDao.kt` — `observeByUser` (Flow, без сортування в SQL), `countByUser` (suspend), `insert`, `updateName`, `updateBought`, `deleteById`.
+- `shopping/data/repository/LocalShoppingRepository.kt` — реалізує `ShoppingRepository`; мапінг Entity↔domain (`userId` лишається в data); `add` через `TransactionRunner` атомарно: `countByUser` + перевірка ліміту + `insert`; помилки мапляться в `ShoppingError.Unknown`.
+- `core/data/HomlyDatabase.kt` — додано `ShoppingItemEntity`, `version = 2`, `shoppingItemDao()`.
+- `HomlyApplication.kt` (`AppContainer`) — спільний `transactionRunner`, виставлено `shoppingRepository`; `fallbackToDestructiveMigration(dropAllTables = true)` у білдері.
+- androidTest: `ShoppingItemDaoTest` (фільтрація за `userId`, відсутність витоку, оновлення Flow на insert/edit/toggle/delete, `countByUser`), `LocalShoppingRepositoryTest` (атомарність ліміту 50, ліміт per-user, edit не чіпає `createdAt`/`isBought`).
+
+**Відхилення від плану:**
+- Замість застарілого `fallbackToDestructiveMigration()` використано `fallbackToDestructiveMigration(dropAllTables = true)` — актуальний незадепрекейчений API Room 2.7.1 (та сама семантика).
+
+**Build / review:** `gradlew build` → `BUILD SUCCESSFUL`; unit-тести зелені, androidTest компілюється (виконання — на емуляторі, гейт Ітерації 3). Self-review проти плану → ✅.

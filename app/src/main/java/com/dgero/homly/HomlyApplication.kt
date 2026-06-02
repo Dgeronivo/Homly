@@ -11,6 +11,8 @@ import com.dgero.homly.auth.data.session.DataStoreSessionRepository
 import com.dgero.homly.auth.domain.repository.SessionRepository
 import com.dgero.homly.auth.domain.repository.UserRepository
 import com.dgero.homly.core.data.HomlyDatabase
+import com.dgero.homly.shopping.data.repository.LocalShoppingRepository
+import com.dgero.homly.shopping.domain.repository.ShoppingRepository
 
 class HomlyApplication : Application() {
     val container: AppContainer by lazy { AppContainer(this) }
@@ -19,15 +21,22 @@ class HomlyApplication : Application() {
 class AppContainer(context: Context) {
     val db: HomlyDatabase = Room.databaseBuilder(
         context, HomlyDatabase::class.java, "homly.db"
-    ).build()
+    ).fallbackToDestructiveMigration(dropAllTables = true).build()
 
     val sessionRepository: SessionRepository = DataStoreSessionRepository(context)
+
+    private val transactionRunner = object : TransactionRunner {
+        override suspend fun <T> invoke(block: suspend () -> T): T = db.withTransaction { block() }
+    }
 
     val userRepository: UserRepository = LocalUserRepository(
         userDao = db.userDao(),
         passwordHasher = Pbkdf2PasswordHasher(),
-        runTransaction = object : TransactionRunner {
-            override suspend fun <T> invoke(block: suspend () -> T): T = db.withTransaction { block() }
-        },
+        runTransaction = transactionRunner,
+    )
+
+    val shoppingRepository: ShoppingRepository = LocalShoppingRepository(
+        dao = db.shoppingItemDao(),
+        runTransaction = transactionRunner,
     )
 }
