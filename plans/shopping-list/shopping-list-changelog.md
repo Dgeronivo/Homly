@@ -55,3 +55,25 @@
 - `make connected-test` не виконано — підключеного емулятора/пристрою немає (`adb devices` порожній). androidTest-джерела компілюються (`compileDebugAndroidTestKotlin` → `BUILD SUCCESSFUL`).
 
 **Build / review:** `gradlew clean build` (= `make rebuild`) → `BUILD SUCCESSFUL`; усі unit-тести зелені; lint чистий. Self-review проти плану → ✅.
+
+---
+
+## Iteration 4 — 2026-06-03 (Наскрізне ревью)
+
+Наскрізне ревью всієї фічі (commits Ітерацій 1–3) проти `ARCHITECTURE.md` і `code-quality.md`.
+
+**Перевірено (✅):**
+- Структура пакетів `shopping/{domain,data,presentation}` + `core/data`; MVVM зі `StateFlow` + `collectAsStateWithLifecycle`; Navigation Compose; один `Activity`.
+- Відсутність витоку `userId`: `flatMapLatest` перепідписується на зміну користувача; DAO/репозиторій скоупляться за `userId`; покрито VM- та DAO-тестами.
+- Ліміт/валідація на стиках: валідація назви — в use case, ліміт — атомарно в репозиторії, UI блокує поле на 50 і мапить `LimitReached`.
+- SOLID / одна відповідальність; залежності лише всередину; спільний `transactionRunner` (DRY).
+
+**Post-review findings:**
+1. Helper text у `ShoppingListScreen` хардкодив «max 50 items», дублюючи `ShoppingLimits.MAX_ITEMS` (єдине джерело правди) — ризик розсинхрону при зміні ліміту.
+
+**Виправлення:**
+1. Helper text тепер посилається на `ShoppingLimits.MAX_ITEMS` через інтерполяцію.
+
+**Build / review:** `gradlew clean build` → `BUILD SUCCESSFUL`; усі unit-тести зелені; lint чистий. Final review → ✅.
+
+> Примітка: `make connected-test` по всій фічі не виконано — немає підключеного емулятора/пристрою (`adb devices` порожній). Усі androidTest-джерела компілюються; запустити на емуляторі при можливості.

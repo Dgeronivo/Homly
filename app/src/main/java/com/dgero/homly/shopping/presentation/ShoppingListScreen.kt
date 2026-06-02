@@ -37,6 +37,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.dgero.homly.shopping.domain.model.ShoppingItem
+import com.dgero.homly.shopping.domain.model.ShoppingLimits
 import com.dgero.homly.shopping.domain.model.ShoppingSortOrder
 import com.dgero.homly.ui.theme.HomlyTheme
 
@@ -143,7 +144,7 @@ private fun AddItemRow(
             keyboardActions = KeyboardActions(onDone = { if (canAdd) onAdd() }),
             supportingText = {
                 when {
-                    isLimitReached -> Text("List is full (max 50 items)")
+                    isLimitReached -> Text("List is full (max ${ShoppingLimits.MAX_ITEMS} items)")
                     errorMessage != null -> Text(errorMessage)
                 }
             },
