@@ -1,5 +1,7 @@
 # TODO / Issues / Plans / Debt
 
+- check mcp
+- Можливість вводити кирилицю при авторизації
 - implement auth. Login, pass. Saving in local storage and in backend DB by interfaces and env.
 
 ## Pending
