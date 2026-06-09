@@ -1,12 +1,11 @@
 # TODO / Issues / Plans / Debt
 
-- check mcp
+- додати PDR https://github.com/genkovich/agentic-engineering-course-public/blob/main/modules/6-sdlc/sdlc/examples/course-lesson-mvp/PRD.md
 - Можливість вводити кирилицю при авторизації
 - implement auth. Login, pass. Saving in local storage and in backend DB by interfaces and env.
 
 ## Pending
 
-- [ ] Install the skill-creator plugin — `/plugin install skill-creator@claude-plugins-official` lets you create and refine custom skills using evals.
 - [ ] Browse official plugins — `/plugin` shows available bundles of skills, hooks, and MCP servers you can add to Claude Code.
 - [ ] Add ktlint or detekt — once the app has meaningful code, a linter will help Claude catch style issues on its own edits.
 - [ ] Set up GitHub CLI — `winget install GitHub.cli` on Windows; enables PR and issue management from the terminal.

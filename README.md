@@ -64,3 +64,6 @@ feature/
 # Run instrumented tests (requires connected device/emulator)
 ./gradlew connectedAndroidTest
 ```
+
+Vocabulary:
+PRD (Product Requirements Document)
