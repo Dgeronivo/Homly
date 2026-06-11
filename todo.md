@@ -4,6 +4,12 @@
 - Можливість вводити кирилицю при авторизації
 - implement auth. Login, pass. Saving in local storage and in backend DB by interfaces and env.
 
+## На обговорення
+
+- [ ] **Атомарні бізнес-інваріанти в data-шарі (ліміт shopping-списку).** `LocalShoppingRepository.add` застосовує ліміт `MAX_ITEMS = 50` всередині транзакції (`countByUser` + `insert` атомарно), а не в `AddShoppingItemUseCase`. Значення/помилка/контракт лежать у domain (`ShoppingLimits`, `ShoppingError.LimitReached`, kdoc інтерфейсу), але саме *застосування* — у data.
+  - **Чому так:** це check-then-act інваріант. Перевірка в use case (`count()` → `add()`) = два окремі виклики → TOCTOU-гонка (два паралельні `add` бачать 49 → вставляють 51). Атомарність вимагає транзакції Room, а транзакція — інфраструктурна межа, доступна лише в data-шарі. Той самий патерн уже в `LocalUserRepository.register` (унікальність акаунта в транзакції).
+  - **Питання на обговорення:** (1) чи лишаємо це усталеним патерном для всіх майбутніх атомарних інваріантів (todo, calendar); (2) чи варто підсилити kdoc `ShoppingRepository.add` явним «transactional invariant», щоб не сприймалось як хардкод; (3) чи треба domain-сервіс/абстракція над транзакцією для «чистоти» — поки виглядає як over-engineering для Room; (4) реальне застосування ліміту тестується лише в androidTest (фейк-репо в unit-тесті дублює правило) — чи влаштовує.
+
 ## Pending
 
 - [ ] Browse official plugins — `/plugin` shows available bundles of skills, hooks, and MCP servers you can add to Claude Code.
