@@ -59,7 +59,28 @@ ticket: ""
 
 ## 3. Context and scope
 
-_to be filled_
+The todo-list feature is one of four core modules (events, todo, shopping, family) in the Homly family planning app. Each family member manages a private, per-user list of tasks with "done" status — replacing ad-hoc Telegram coordination. In v1, all data is local to the device (Room SQLite); cross-user sharing and a remote backend are deferred to later iterations.
+
+**External systems (in / out):**
+
+| Actor or system | Type | Interaction |
+|---|---|---|
+| user | Person | creates, views, edits, deletes own todo-items |
+
+*(No external systems in v1 — all state lives in local Room SQLite. A remote backend is a planned addition in a later iteration.)*
+
+**C4 Context (L1):**
+
+```mermaid
+C4Context
+    title Homly App — System Context (todo-list)
+
+    Person(user, "user", "family member — manages personal todo-list")
+
+    System(homly, "Homly Android App", "local family planning app: events, todo, shopping, family modules")
+
+    Rel(user, homly, "manages todo-items", "touch / Compose UI")
+```
 
 ## 4. Solution strategy
 
