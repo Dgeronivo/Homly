@@ -185,7 +185,15 @@ sequenceDiagram
 
 ## 8. Crosscutting concepts
 
-_to be filled_
+| Concept | Convention | Where defined |
+|---|---|---|
+| Auth / session | `currentUserId` via `SessionRepository` (DataStore) | auth module (existing) |
+| Error handling | Sealed `TodoError` per `Result<T>` wrapper | ADR-0001 + todo `domain/error/` |
+| Data isolation | `userId` parameter in every DAO query | ADR-0002 + todo `data/db/` |
+| Concurrency | Coroutines + Flow; `collectAsStateWithLifecycle` in Screen | CLAUDE.md + §2 constraints |
+| ID strategy | Room auto-generated `Long` PK (consistent with shopping module) | shopping module pattern |
+| Observability | N/A — prototype, no crash reporting or analytics in v1 | — |
+| Internationalisation | N/A — single-language prototype | — |
 
 ## 9. Architecture decisions
 
