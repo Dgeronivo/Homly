@@ -34,7 +34,28 @@ ticket: ""
 
 ## 2. Constraints
 
-_to be filled_
+**Technical.**
+- Kotlin + Jetpack Compose (Material3)
+- Android SDK: min 24, target/compile 36
+- Room 2.7.1 (SQLite persistence)
+- DataStore 1.1.4 (encrypted session / userId)
+- Coroutines + Flow/StateFlow
+- Architecture convention: MVVM + Clean Architecture (CLAUDE.md)
+
+**Organisational.**
+- 1 developer (Alex); no hard deadline — prototype
+- Target scale: 1 family group, 2–6 users
+
+**Conventions.**
+- CLAUDE.md: Compose-only, 4-space indent, one composable per screen file
+- Error handling: sealed class (mirror shopping module: `EmptyName`, `NameTooLong`, `LimitReached`)
+- `MAX_ITEMS = 50`, `MAX_NAME_LENGTH = 100` (confirmed in PRD §1 + §8)
+- `TransactionRunner` for atomic add-with-limit check
+
+**Regulatory / external.**
+- Data classification: internal — personal task titles, not public
+- No GDPR/SOC2 scope (single-family prototype)
+- SQLite injection mitigated by Room parameterized queries (PRD §6.1)
 
 ## 3. Context and scope
 
