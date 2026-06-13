@@ -207,7 +207,20 @@ ADR files live under `docs/features/mcp-init/todo-list/adr/NNNN-<title>.md`.
 
 ## 10. Quality requirements
 
-_to be filled_
+**QG-1. Data integrity — ≤50-item limit**
+- **When:** user attempts to add a 51st todo-item
+- **Then:** system returns `TodoError.LimitReached`; no row written to DB; count remains ≤ 50 (AC-11; PRD §6 NFR)
+- **How verify:** `AndroidTest: addItem_whenAtLimit_returnsLimitReached()` — add 50 items, assert 51st call returns `Result.Failure(TodoError.LimitReached)`, verify DB count = 50
+
+**QG-2. Authorization correctness — cross-user access denied**
+- **When:** authenticated user A calls toggle/edit/delete on an `itemId` owned by user B
+- **Then:** returns `Result.Failure(TodoError.Unauthorized)`; does not reveal item existence; DB unchanged (AC-10)
+- **How verify:** unit test on `ToggleTodoItemUseCase` with mismatched `userId` — assert `Failure(TodoError.Unauthorized)` and DB row unchanged
+
+**QG-3. Architectural conformance — MVVM + Clean Architecture**
+- **When:** a developer reads `com.dgero.homly.todolist/` source
+- **Then:** package structure matches §5 (domain / data / presentation); no cross-layer imports; ViewModel exposes `StateFlow<TodoListUiState>`; sealed `TodoError` used in all error paths
+- **How verify:** PR code review checklist — check layer imports; verify `TodoListViewModel` returns `StateFlow`; confirm all error branches use `TodoError` variants
 
 ## 11. Risks and technical debt
 
