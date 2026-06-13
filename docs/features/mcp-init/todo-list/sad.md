@@ -16,6 +16,9 @@ ticket: ""
 
 ## 1. Introduction and goals
 
+**Decision overrides.**
+- F1 (§6 userId step omitted from sequence diagram) — overridden by author, rationale: shopping module pattern is identical — ViewModel holds `currentUserId: StateFlow<Long?>` collected once from SessionRepository at startup; `onAdd()` reads `.value` without a new call. The C4 Container diagram (§5) already shows `Rel(vm, session, "observes currentUserId", "Flow")`. Adding a per-action step in §6 would misrepresent the runtime model.
+
 **Intent.** Family members currently store todo-items in Telegram chats and the coordinator's memory. The todo-list feature gives every user in the family app a structured, private task list with "done" status — removing Telegram as the coordination medium. In v1 the list is per-user; family-shared access is deferred to the family module.
 
 **Top-3 quality goals (1-liners; full scenarios in §10):**

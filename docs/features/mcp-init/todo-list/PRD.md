@@ -180,4 +180,4 @@ ticket: ""
 
 - [x] Яка максимальна кількість todo-items per user? **Вирішено: 50** *(2026-06-13)*
 - [x] Чи потрібне сортування todo-list? **Вирішено: невиконані за датою створення (новіші першими); виконані — в кінець при відкритті списку, не одразу** *(2026-06-13)*
-- [ ] Чи гарантує Room DB durability (writes survive process death) без додаткових заходів для прототипу? *(F3 — idea-brief §10 edge-case 4: offline divergence як trust risk)* — owner: Alex, due: перед architecture-design
+- [x] Чи гарантує Room DB durability (writes survive process death) без додаткових заходів для прототипу? **Вирішено: так — Room/SQLite є ACID-compliant, committed writes виживають після process death без додаткових заходів** *(2026-06-13)*
