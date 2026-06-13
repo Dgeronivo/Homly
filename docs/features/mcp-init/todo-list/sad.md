@@ -96,7 +96,59 @@ Each tactical decision in later sections traces to one of these choices. Decisio
 
 ## 5. Building block view
 
-_to be filled_
+The todo-list module is a new vertical slice inside the existing Homly monolith, following the same MVVM + Clean Architecture layering as the shopping module. Presentation collects from ViewModel; ViewModel orchestrates use cases; domain defines `TodoItem`, `TodoError`, and `TodoRepository` interface; data implements the repository via Room DAO. This is the established project convention (CLAUDE.md). *(→ ADR-0003)*
+
+**Internal decomposition:**
+
+```
+com.dgero.homly/todo-list/
+├── domain/
+│   ├── model/          TodoItem.kt
+│   └── error/          TodoError.kt  (sealed: EmptyName, NameTooLong, LimitReached, Unauthorized)
+├── domain/repository/  TodoRepository.kt  (interface)
+├── domain/usecase/
+│   ├── ObserveTodoItemsUseCase.kt
+│   ├── AddTodoItemUseCase.kt
+│   ├── EditTodoItemUseCase.kt
+│   ├── ToggleTodoItemUseCase.kt
+│   └── DeleteTodoItemUseCase.kt
+├── data/
+│   ├── db/             TodoItemEntity.kt, TodoItemDao.kt
+│   └── repo/           LocalTodoRepository.kt
+└── presentation/
+    ├── TodoListScreen.kt
+    └── TodoListViewModel.kt
+```
+
+*(Kotlin package: `com.dgero.homly.todolist` — hyphens are not valid in package names.)*
+
+**C4 Container (L2):**
+
+```mermaid
+C4Container
+    title Homly App — Containers (todo-list scope)
+
+    Person(user, "user")
+
+    Container_Boundary(homly, "Homly Android App") {
+        Container(ui, "TodoListScreen", "Jetpack Compose", "todo-list UI, collects StateFlow")
+        Container(vm, "TodoListViewModel", "Kotlin + Coroutines", "StateFlow<TodoListUiState>, orchestrates use cases")
+        Container(uc, "Todo Use Cases", "Kotlin", "Observe, Add, Edit, Toggle, Delete — enforce domain rules")
+        Container(repo, "LocalTodoRepository", "Room + Kotlin", "CRUD + TransactionRunner limit check")
+        Container(session, "SessionRepository", "DataStore", "provides currentUserId as Flow")
+        Container(auth, "auth module", "Kotlin", "login, registration, session management")
+    }
+
+    ContainerDb(db, "HomlyDatabase", "Room / SQLite", "TodoItemEntity, UserEntity, ShoppingItemEntity")
+
+    Rel(user, ui, "interacts", "touch")
+    Rel(ui, vm, "collectAsStateWithLifecycle", "StateFlow")
+    Rel(vm, uc, "calls", "suspend / Flow")
+    Rel(vm, session, "observes currentUserId", "Flow")
+    Rel(uc, repo, "calls", "suspend fun")
+    Rel(repo, db, "reads/writes TodoItemEntity", "Room DAO")
+    Rel(auth, session, "writes session on login", "DataStore")
+```
 
 ## 6. Runtime view
 
@@ -116,6 +168,7 @@ _to be filled_
 |---|---|---|---|
 | 0001 | Use sealed TodoError and TransactionRunner for domain validation | Accepted | §4 |
 | 0002 | Enforce per-user isolation at the DAO layer | Accepted | §4 |
+| 0003 | Create standalone todo-list module | Accepted | §5 |
 
 ADR files live under `docs/features/mcp-init/todo-list/adr/NNNN-<title>.md`.
 
