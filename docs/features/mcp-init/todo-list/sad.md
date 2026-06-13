@@ -226,9 +226,12 @@ ADR files live under `docs/features/mcp-init/todo-list/adr/NNNN-<title>.md`.
 
 | Risk / debt | Severity | Mitigation | Owner |
 |---|---|---|---|
+| HomlyDatabase uses destructive migration — a schema error in any module wipes all local data including todo-items | Medium | Pin DB version before each release; add Room migration tests to CI before schema changes | Alex |
+| Local-only storage (no backup) — if device is wiped or replaced, all todo-items are permanently lost | Medium | Document as v1 limitation; add export/backup/sync in a future iteration when remote backend is added | Alex |
+| Room DB durability (PRD §8 open question) — does Room guarantee writes survive process death? | Low | Resolved: Room/SQLite is ACID-compliant — committed writes survive process death without additional measures | Alex |
 
 **Accepted debt (acceptable in v1, plan to fix later):**
-_to be filled_
+- Single-device local-only storage: no synchronisation or backup; remote backend deferred to a later iteration (noted in §3).
 
 ## 12. Glossary
 
