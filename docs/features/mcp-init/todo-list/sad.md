@@ -84,7 +84,15 @@ C4Context
 
 ## 4. Solution strategy
 
-_to be filled_
+**Top-3 strategic choices (seeds for ADRs):**
+
+1. **Sealed-class error model + `TransactionRunner` for limit enforcement** — `TodoError` sealed class (`EmptyName`, `NameTooLong`, `LimitReached`, `Unauthorized`) paired with `TransactionRunner` to atomically check the ≤50-item limit and insert in one DB transaction. Gives a clear domain contract and prevents partial-write inconsistencies. *(→ ADR-0001)*
+
+2. **Per-user data isolation at the DAO layer** — every Room DAO query takes `userId` as a parameter; the ViewModel always sources `userId` from `SessionRepository.currentUserId`. This makes it structurally impossible to accidentally read another user's items, satisfying QG-2 (authorization correctness). The alternative — filtering in the domain service — leaves the DAO "open" and shifts authz responsibility upward. *(→ ADR-0002)*
+
+3. **Lazy sort (deferred reorder on list-open)** — done items are moved to the bottom of the list when the list is opened, not immediately on toggle. Implemented as `ORDER BY isDone ASC, createdAt DESC` in the DAO query — natural SQL sort with no additional in-memory logic. Matches PRD AC-03 exactly.
+
+Each tactical decision in later sections traces to one of these choices. Decisions that contradict a strategic choice are red flags — surfaced in §11 Risks.
 
 ## 5. Building block view
 
@@ -106,6 +114,8 @@ _to be filled_
 
 | # | Title | Status | Section |
 |---|---|---|---|
+| 0001 | Use sealed TodoError and TransactionRunner for domain validation | Accepted | §4 |
+| 0002 | Enforce per-user isolation at the DAO layer | Accepted | §4 |
 
 ADR files live under `docs/features/mcp-init/todo-list/adr/NNNN-<title>.md`.
 
