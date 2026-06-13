@@ -16,7 +16,21 @@ ticket: ""
 
 ## 1. Introduction and goals
 
-_to be filled_
+**Intent.** Family members currently store todo-items in Telegram chats and the coordinator's memory. The todo-list feature gives every user in the family app a structured, private task list with "done" status — removing Telegram as the coordination medium. In v1 the list is per-user; family-shared access is deferred to the family module.
+
+**Top-3 quality goals (1-liners; full scenarios in §10):**
+
+1. **Data integrity** — the ≤50-item limit is enforced atomically; no partial write leaves the list in an inconsistent state.
+2. **Authorization correctness** — a user can only read and modify their own todo-items; the system must not reveal the existence of another user's items (AC-10).
+3. **Architectural conformance** — the todo module follows the project's MVVM + Clean Architecture layering (presentation / domain / data) with no layer violations.
+
+**Stakeholders.**
+
+| Role | Interest | Sign-off owner? |
+|---|---|---|
+| user | manages personal todo-list, primary beneficiary | No |
+| Tech Lead | SAD approval, architecture review | Yes |
+| Alex | decision owner, implements feature | No |
 
 ## 2. Constraints
 
