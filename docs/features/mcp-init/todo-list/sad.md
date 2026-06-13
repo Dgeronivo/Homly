@@ -152,7 +152,32 @@ C4Container
 
 ## 6. Runtime view
 
-_to be filled_
+**Critical flow: Add todo-item (happy path)**
+
+```mermaid
+sequenceDiagram
+    actor user
+    participant TodoListScreen
+    participant TodoListViewModel
+    participant AddTodoItemUseCase
+    participant LocalTodoRepository
+    participant HomlyDatabase
+
+    user->>TodoListScreen: enters title, taps Add
+    TodoListScreen->>TodoListViewModel: onAddTodo(title)
+    TodoListViewModel->>AddTodoItemUseCase: invoke(userId, title)
+    AddTodoItemUseCase->>LocalTodoRepository: add(userId, title)
+    LocalTodoRepository->>HomlyDatabase: TransactionRunner { count(userId) + insert }
+    HomlyDatabase-->>LocalTodoRepository: Result.Success(TodoItem)
+    LocalTodoRepository-->>AddTodoItemUseCase: Result.Success
+    AddTodoItemUseCase-->>TodoListViewModel: Result.Success
+    TodoListViewModel-->>TodoListScreen: StateFlow update (new item in list)
+```
+
+*Failure modes (inline, not diagrammed — flows are simple):*
+- **LimitReached**: `TransactionRunner` sees count ≥ 50 → returns `TodoError.LimitReached` → UI shows error.
+- **Unauthorized** (toggle/edit/delete): DAO `WHERE userId=:userId` matches 0 rows → returns `TodoError.Unauthorized` → UI silently ignores per AC-10.
+- **EmptyName / NameTooLong**: validated in `AddTodoItemUseCase` before DB call → returns `TodoError.EmptyName` / `TodoError.NameTooLong` → UI shows error.
 
 ## 7. Deployment view
 
