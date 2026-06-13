@@ -181,7 +181,7 @@ sequenceDiagram
 
 ## 7. Deployment view
 
-_to be filled_
+<!-- N/A: Android single-device app; all state is local (Room SQLite + DataStore); todo-list feature adds no new deployment unit, process, or external dependency. Monitoring and crash reporting are out of scope for the v1 prototype. -->
 
 ## 8. Crosscutting concepts
 
