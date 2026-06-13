@@ -237,3 +237,11 @@ ADR files live under `docs/features/mcp-init/todo-list/adr/NNNN-<title>.md`.
 
 | Term | Meaning |
 |---|---|
+| todo-item | справа, яку потрібно виконати (CONTEXT.md) |
+| user | окрема людина, що є членом family та має власний профіль у застосунку (CONTEXT.md) |
+| family | група людей зі спільним доступом до todo-items, shopping-list та подій (CONTEXT.md) |
+| TodoError | sealed class з варіантами `EmptyName`, `NameTooLong`, `LimitReached`, `Unauthorized` — домен-контракт для всіх помилок todo-list |
+| TransactionRunner | абстракція над `db.withTransaction {}` — атомарна перевірка ліміту + вставка в одній Room-транзакції |
+| LimitReached | варіант `TodoError` — спрацьовує коли список досяг MAX_ITEMS = 50 |
+| HomlyDatabase | Room SQLite singleton, спільна для всіх модулів (auth, shopping, todo-list) |
+| StateFlow&lt;TodoListUiState&gt; | реактивний стан VM; Screen підписується через `collectAsStateWithLifecycle` |
