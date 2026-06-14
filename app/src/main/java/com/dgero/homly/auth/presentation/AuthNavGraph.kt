@@ -9,6 +9,8 @@ import com.dgero.homly.auth.domain.repository.SessionRepository
 import com.dgero.homly.auth.domain.repository.UserRepository
 import com.dgero.homly.auth.domain.usecase.LoginUserUseCase
 import com.dgero.homly.auth.domain.usecase.RegisterUserUseCase
+import com.dgero.homly.auth.domain.validation.LoginValidator
+import com.dgero.homly.auth.domain.validation.PasswordValidator
 import com.dgero.homly.auth.presentation.login.LoginScreen
 import com.dgero.homly.auth.presentation.login.LoginViewModel
 import com.dgero.homly.auth.presentation.register.RegisterScreen
@@ -23,7 +25,9 @@ fun NavGraphBuilder.authGraph(
         composable("auth/login") {
             val vm: LoginViewModel = viewModel(
                 factory = LoginViewModel.Factory(
-                    LoginUserUseCase(userRepository, sessionRepository)
+                    loginUserUseCase = LoginUserUseCase(userRepository, sessionRepository),
+                    loginValidator = LoginValidator(),
+                    passwordValidator = PasswordValidator(),
                 )
             )
             LoginScreen(
@@ -39,7 +43,9 @@ fun NavGraphBuilder.authGraph(
         composable("auth/register") {
             val vm: RegisterViewModel = viewModel(
                 factory = RegisterViewModel.Factory(
-                    RegisterUserUseCase(userRepository, sessionRepository)
+                    registerUserUseCase = RegisterUserUseCase(userRepository, sessionRepository),
+                    loginValidator = LoginValidator(),
+                    passwordValidator = PasswordValidator(),
                 )
             )
             RegisterScreen(

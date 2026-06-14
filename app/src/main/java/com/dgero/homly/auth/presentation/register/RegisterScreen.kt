@@ -56,7 +56,10 @@ private fun RegisterContent(
     onRegisterClick: () -> Unit,
     onLoginClick: () -> Unit,
 ) {
-    val isFormValid = uiState.login.trim().length >= 3 && uiState.password.length >= 4
+    val isFormValid = uiState.login.trim().length >= 3
+        && uiState.password.length >= 4
+        && uiState.loginError == null
+        && uiState.passwordError == null
 
     Column(
         modifier = Modifier
@@ -72,6 +75,10 @@ private fun RegisterContent(
             onValueChange = onLoginChange,
             label = { Text("Login") },
             singleLine = true,
+            isError = uiState.loginError != null,
+            supportingText = {
+                Text(uiState.loginError ?: "Only English letters and digits, min 3 characters")
+            },
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
             modifier = Modifier.fillMaxWidth(),
             enabled = !uiState.isLoading,
@@ -82,16 +89,20 @@ private fun RegisterContent(
             onValueChange = onPasswordChange,
             label = { Text("Password") },
             singleLine = true,
+            isError = uiState.passwordError != null,
+            supportingText = {
+                Text(uiState.passwordError ?: "Min 4 characters, letters, digits and special characters")
+            },
             visualTransformation = PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
             keyboardActions = KeyboardActions(onDone = { if (isFormValid) onRegisterClick() }),
             modifier = Modifier.fillMaxWidth(),
             enabled = !uiState.isLoading,
         )
-        if (uiState.errorMessage != null) {
+        if (uiState.authError != null) {
             Spacer(Modifier.height(8.dp))
             Text(
-                text = uiState.errorMessage,
+                text = uiState.authError,
                 color = MaterialTheme.colorScheme.error,
                 style = MaterialTheme.typography.bodyMedium,
             )
@@ -121,6 +132,23 @@ private fun RegisterContentPreview() {
     HomlyTheme {
         RegisterContent(
             uiState = RegisterUiState(),
+            onLoginChange = {},
+            onPasswordChange = {},
+            onRegisterClick = {},
+            onLoginClick = {},
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun RegisterContentWithErrorPreview() {
+    HomlyTheme {
+        RegisterContent(
+            uiState = RegisterUiState(
+                login = "кирилиця",
+                loginError = "Login can only contain letters and digits",
+            ),
             onLoginChange = {},
             onPasswordChange = {},
             onRegisterClick = {},
