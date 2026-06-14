@@ -1,8 +1,7 @@
 # TODO / Issues / Plans / Debt
 
-- додати PDR https://github.com/genkovich/agentic-engineering-course-public/blob/main/modules/6-sdlc/sdlc/examples/course-lesson-mvp/PRD.md
 - Можливість вводити кирилицю при авторизації
-- implement auth. Login, pass. Saving in local storage and in backend DB by interfaces and env.
+- проблеми з вводом кирилиці з клавіатури
 
 ## На обговорення
 
