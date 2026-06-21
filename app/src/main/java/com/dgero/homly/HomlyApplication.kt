@@ -13,6 +13,8 @@ import com.dgero.homly.auth.domain.repository.UserRepository
 import com.dgero.homly.core.data.HomlyDatabase
 import com.dgero.homly.shopping.data.repository.LocalShoppingRepository
 import com.dgero.homly.shopping.domain.repository.ShoppingRepository
+import com.dgero.homly.todolist.data.repository.LocalTodoRepository
+import com.dgero.homly.todolist.domain.repository.TodoRepository
 
 class HomlyApplication : Application() {
     val container: AppContainer by lazy { AppContainer(this) }
@@ -37,6 +39,11 @@ class AppContainer(context: Context) {
 
     val shoppingRepository: ShoppingRepository = LocalShoppingRepository(
         dao = db.shoppingItemDao(),
+        runTransaction = transactionRunner,
+    )
+
+    val todoRepository: TodoRepository = LocalTodoRepository(
+        dao = db.todoItemDao(),
         runTransaction = transactionRunner,
     )
 }

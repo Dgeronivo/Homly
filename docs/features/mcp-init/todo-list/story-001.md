@@ -124,9 +124,9 @@ In-memory DB + real `TransactionRunner`. Перевіряє:
 
 ## Definition of done
 
-- [ ] Усі файли у пакеті `com.dgero.homly.todolist.*`
-- [ ] `HomlyDatabase` version = 3, entity зареєстрована, DAO-метод присутній
-- [ ] `AppContainer` має `todoRepository`
-- [ ] `make rebuild` — зелений
-- [ ] `make test` — `TodoTitleValidatorTest` зелений
-- [ ] `make connected-test` — всі нові AndroidTest зелені
+- [x] Усі файли у пакеті `com.dgero.homly.todolist.*`
+- [x] `HomlyDatabase` version = 3, entity зареєстрована, DAO-метод присутній
+- [x] `AppContainer` має `todoRepository`
+- [x] `make rebuild` — зелений
+- [x] `make test` — `TodoTitleValidatorTest` зелений
+- [x] `make connected-test` — всі нові AndroidTest зелені
