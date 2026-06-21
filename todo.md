@@ -1,6 +1,5 @@
 # TODO / Issues / Plans / Debt
 
-- Можливість вводити кирилицю при авторизації
 - проблеми з вводом кирилиці з клавіатури
 
 ## На обговорення
@@ -20,7 +19,7 @@
 Planned features:
 - Calendar with events and reminders
 - To-do list (shared between family members)
-- Shopping list (shared between family members)
+- Shopping list (shared between family members) - +
 - Family mode — members can see each other's events and lists
 - Voice input — keyword phrases trigger actions without a keyboard (e.g., "Buy sugar 1kg" adds to shopping list)
 - translations
