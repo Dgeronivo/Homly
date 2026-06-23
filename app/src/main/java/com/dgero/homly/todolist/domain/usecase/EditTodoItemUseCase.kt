@@ -7,5 +7,9 @@ class EditTodoItemUseCase(
     private val repository: TodoRepository,
     private val validator: TodoTitleValidator,
 ) {
-    suspend operator fun invoke(id: Long, userId: Long, title: String): Result<Unit> = TODO()
+    suspend operator fun invoke(id: Long, userId: Long, title: String): Result<Unit> {
+        val error = validator.validate(title)
+        if (error != null) return Result.failure(error)
+        return repository.editTitle(id, userId, title.trim())
+    }
 }

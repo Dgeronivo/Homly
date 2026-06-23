@@ -8,5 +8,9 @@ class AddTodoItemUseCase(
     private val repository: TodoRepository,
     private val validator: TodoTitleValidator,
 ) {
-    suspend operator fun invoke(userId: Long, title: String): Result<TodoItem> = TODO()
+    suspend operator fun invoke(userId: Long, title: String): Result<TodoItem> {
+        val error = validator.validate(title)
+        if (error != null) return Result.failure(error)
+        return repository.add(userId, title.trim())
+    }
 }
