@@ -28,6 +28,14 @@ import com.dgero.homly.shopping.domain.usecase.ObserveShoppingItemsUseCase
 import com.dgero.homly.shopping.domain.usecase.ToggleShoppingItemUseCase
 import com.dgero.homly.shopping.presentation.ShoppingListScreen
 import com.dgero.homly.shopping.presentation.ShoppingListViewModel
+import com.dgero.homly.todolist.domain.usecase.AddTodoItemUseCase
+import com.dgero.homly.todolist.domain.usecase.DeleteTodoItemUseCase
+import com.dgero.homly.todolist.domain.usecase.EditTodoItemUseCase
+import com.dgero.homly.todolist.domain.usecase.ObserveTodoItemsUseCase
+import com.dgero.homly.todolist.domain.usecase.ToggleTodoItemUseCase
+import com.dgero.homly.todolist.domain.validation.TodoTitleValidator
+import com.dgero.homly.todolist.presentation.TodoListScreen
+import com.dgero.homly.todolist.presentation.TodoListViewModel
 import com.dgero.homly.ui.theme.HomlyTheme
 import kotlinx.coroutines.flow.first
 
@@ -83,11 +91,29 @@ private fun AuthGate(container: AppContainer) {
                     HomeScreen(
                         viewModel = vm,
                         onOpenShoppingList = { navController.navigate("shopping") },
+                        onOpenTodoList = { navController.navigate("todo-list") },
                         onLogout = {
                             navController.navigate("auth") {
                                 popUpTo("home") { inclusive = true }
                             }
                         },
+                    )
+                }
+                composable("todo-list") {
+                    val vm: TodoListViewModel = viewModel(
+                        factory = TodoListViewModel.Factory(
+                            observeItems = ObserveTodoItemsUseCase(container.todoRepository),
+                            addItem = AddTodoItemUseCase(container.todoRepository, TodoTitleValidator),
+                            editItem = EditTodoItemUseCase(container.todoRepository, TodoTitleValidator),
+                            toggleItem = ToggleTodoItemUseCase(container.todoRepository),
+                            deleteItem = DeleteTodoItemUseCase(container.todoRepository),
+                            validator = TodoTitleValidator,
+                            sessionRepository = container.sessionRepository,
+                        )
+                    )
+                    TodoListScreen(
+                        viewModel = vm,
+                        onBack = { navController.popBackStack() },
                     )
                 }
                 composable("shopping") {

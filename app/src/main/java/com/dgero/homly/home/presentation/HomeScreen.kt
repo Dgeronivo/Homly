@@ -21,6 +21,7 @@ import com.dgero.homly.ui.theme.HomlyTheme
 fun HomeScreen(
     viewModel: HomeViewModel,
     onOpenShoppingList: () -> Unit,
+    onOpenTodoList: () -> Unit,
     onLogout: () -> Unit,
 ) {
     val login by viewModel.login.collectAsStateWithLifecycle()
@@ -28,6 +29,7 @@ fun HomeScreen(
     HomeContent(
         login = login,
         onOpenShoppingList = onOpenShoppingList,
+        onOpenTodoList = onOpenTodoList,
         onLogout = { viewModel.onLogout(onLogout) },
     )
 }
@@ -36,6 +38,7 @@ fun HomeScreen(
 private fun HomeContent(
     login: String,
     onOpenShoppingList: () -> Unit,
+    onOpenTodoList: () -> Unit,
     onLogout: () -> Unit,
 ) {
     Column(
@@ -49,6 +52,10 @@ private fun HomeContent(
             Text("Shopping list")
         }
         Spacer(Modifier.height(8.dp))
+        Button(onClick = onOpenTodoList) {
+            Text("Todo list")
+        }
+        Spacer(Modifier.height(8.dp))
         Button(onClick = onLogout) {
             Text("Log out")
         }
@@ -59,6 +66,6 @@ private fun HomeContent(
 @Composable
 private fun HomeContentPreview() {
     HomlyTheme {
-        HomeContent(login = "alex", onOpenShoppingList = {}, onLogout = {})
+        HomeContent(login = "alex", onOpenShoppingList = {}, onOpenTodoList = {}, onLogout = {})
     }
 }
