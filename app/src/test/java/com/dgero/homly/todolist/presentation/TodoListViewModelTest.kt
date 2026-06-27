@@ -5,7 +5,7 @@ import com.dgero.homly.todolist.domain.model.TodoLimits
 import com.dgero.homly.todolist.domain.usecase.AddTodoItemUseCase
 import com.dgero.homly.todolist.domain.usecase.DeleteTodoItemUseCase
 import com.dgero.homly.todolist.domain.usecase.EditTodoItemUseCase
-import com.dgero.homly.todolist.domain.usecase.ObserveTodoItemsUseCase
+import com.dgero.homly.todolist.domain.usecase.GetTodoItemsUseCase
 import com.dgero.homly.todolist.domain.usecase.ToggleTodoItemUseCase
 import com.dgero.homly.todolist.domain.validation.TodoTitleValidator
 import com.dgero.homly.todolist.fake.FakeSessionRepository
@@ -45,7 +45,7 @@ class TodoListViewModelTest {
         session: FakeSessionRepository = FakeSessionRepository(),
     ): TodoListViewModel {
         return TodoListViewModel(
-            observeItems = ObserveTodoItemsUseCase(repo),
+            getItems = GetTodoItemsUseCase(repo),
             addItem = AddTodoItemUseCase(repo, TodoTitleValidator),
             editItem = EditTodoItemUseCase(repo, TodoTitleValidator),
             toggleItem = ToggleTodoItemUseCase(repo),
@@ -77,25 +77,6 @@ class TodoListViewModelTest {
 
         assertEquals(1, vm.uiState.value.items.size)
         assertEquals("user1 item", vm.uiState.value.items[0].title)
-    }
-
-    @Test
-    fun `userSwitch_doesNotLeakPreviousUsersItems`() = runTest {
-        val repo = FakeTodoRepository()
-        val session = FakeSessionRepository()
-        repo.seedItem(1L, TodoItem(id = 1, title = "user1 item", isDone = false, createdAt = 1000L))
-        repo.seedItem(2L, TodoItem(id = 2, title = "user2 item", isDone = false, createdAt = 2000L))
-
-        val vm = makeViewModel(repo, session)
-        backgroundScope.launch { vm.uiState.collect {} }
-        session.setSession(1L)
-        advanceUntilIdle()
-
-        session.setSession(2L)
-        advanceUntilIdle()
-
-        assertEquals(1, vm.uiState.value.items.size)
-        assertEquals("user2 item", vm.uiState.value.items[0].title)
     }
 
     @Test

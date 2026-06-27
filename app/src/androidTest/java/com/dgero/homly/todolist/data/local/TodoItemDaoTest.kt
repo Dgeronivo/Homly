@@ -4,7 +4,6 @@ import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.dgero.homly.core.data.HomlyDatabase
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -36,7 +35,7 @@ class TodoItemDaoTest {
     fun insertAndGet_returnsItemsForUser() = runTest {
         dao.insert(TodoItemEntity(userId = 1, title = "Buy milk"))
 
-        val items = dao.getByUser(1).first()
+        val items = dao.getByUser(1)
         assertEquals(1, items.size)
         assertEquals("Buy milk", items[0].title)
     }
@@ -46,8 +45,8 @@ class TodoItemDaoTest {
         dao.insert(TodoItemEntity(userId = 1, title = "Task A"))
         dao.insert(TodoItemEntity(userId = 2, title = "Task B"))
 
-        val user1 = dao.getByUser(1).first()
-        val user2 = dao.getByUser(2).first()
+        val user1 = dao.getByUser(1)
+        val user2 = dao.getByUser(2)
         assertEquals(listOf("Task A"), user1.map { it.title })
         assertEquals(listOf("Task B"), user2.map { it.title })
     }

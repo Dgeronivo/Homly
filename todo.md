@@ -22,6 +22,7 @@ Planned features:
 - To-do list (shared between family members)
 - Shopping list (shared between family members) - +
 - Family mode — members can see each other's events and lists
+- Push - Notification
 - Voice input — keyword phrases trigger actions without a keyboard (e.g., "Buy sugar 1kg" adds to shopping list)
 - translations
 - ліцензія, попередження про збереження данних

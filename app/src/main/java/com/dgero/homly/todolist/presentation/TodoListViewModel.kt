@@ -10,23 +10,20 @@ import com.dgero.homly.todolist.domain.model.TodoLimits
 import com.dgero.homly.todolist.domain.usecase.AddTodoItemUseCase
 import com.dgero.homly.todolist.domain.usecase.DeleteTodoItemUseCase
 import com.dgero.homly.todolist.domain.usecase.EditTodoItemUseCase
-import com.dgero.homly.todolist.domain.usecase.ObserveTodoItemsUseCase
+import com.dgero.homly.todolist.domain.usecase.GetTodoItemsUseCase
 import com.dgero.homly.todolist.domain.usecase.ToggleTodoItemUseCase
 import com.dgero.homly.todolist.domain.validation.TodoTitleValidator
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class TodoListViewModel(
-    private val observeItems: ObserveTodoItemsUseCase,
+    private val getItems: GetTodoItemsUseCase,
     private val addItem: AddTodoItemUseCase,
     private val editItem: EditTodoItemUseCase,
     private val toggleItem: ToggleTodoItemUseCase,
@@ -38,17 +35,20 @@ class TodoListViewModel(
     private val newItemTitle = MutableStateFlow("")
     private val titleError = MutableStateFlow<String?>(null)
     private val formError = MutableStateFlow<String?>(null)
+    private val _items = MutableStateFlow<List<TodoItem>>(emptyList())
 
-    private val currentUserId: StateFlow<Long?> = sessionRepository.currentUserId
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
+    private var userId: Long? = null
 
-    private val items: Flow<List<TodoItem>> = currentUserId.flatMapLatest { userId ->
-        if (userId == null) flowOf(emptyList())
-        else observeItems(userId)
+    init {
+        viewModelScope.launch {
+            val uid = sessionRepository.currentUserId.filterNotNull().first()
+            userId = uid
+            _items.value = getItems(uid)
+        }
     }
 
     val uiState: StateFlow<TodoListUiState> = combine(
-        items, newItemTitle, titleError, formError,
+        _items, newItemTitle, titleError, formError,
     ) { currentItems, title, tError, fError ->
         TodoListUiState(
             items = currentItems,
@@ -70,10 +70,11 @@ class TodoListViewModel(
     }
 
     fun onAdd() {
-        val userId = currentUserId.value ?: return
+        val uid = userId ?: return
         viewModelScope.launch {
-            addItem(userId, newItemTitle.value).fold(
-                onSuccess = {
+            addItem(uid, newItemTitle.value).fold(
+                onSuccess = { item ->
+                    _items.value = listOf(item) + _items.value
                     newItemTitle.value = ""
                     titleError.value = null
                 },
@@ -90,31 +91,48 @@ class TodoListViewModel(
     }
 
     fun onToggle(item: TodoItem) {
-        val userId = currentUserId.value ?: return
-        viewModelScope.launch { toggleItem(item.id, userId, !item.isDone) }
-    }
-
-    fun onEdit(id: Long, newTitle: String) {
-        val userId = currentUserId.value ?: return
+        val uid = userId ?: return
         viewModelScope.launch {
-            editItem(id, userId, newTitle).onFailure { e ->
-                when (e) {
-                    is TodoError.Unauthorized -> {}
-                    is TodoError.EmptyTitle -> titleError.value = "Name cannot be empty"
-                    is TodoError.TitleTooLong -> titleError.value = "Name is too long (max 100 characters)"
-                    else -> formError.value = "Something went wrong"
+            toggleItem(item.id, uid, !item.isDone).onSuccess {
+                _items.value = _items.value.map {
+                    if (it.id == item.id) it.copy(isDone = !item.isDone) else it
                 }
             }
         }
     }
 
+    fun onEdit(id: Long, newTitle: String) {
+        val uid = userId ?: return
+        viewModelScope.launch {
+            editItem(id, uid, newTitle).fold(
+                onSuccess = {
+                    _items.value = _items.value.map {
+                        if (it.id == id) it.copy(title = newTitle) else it
+                    }
+                },
+                onFailure = { e ->
+                    when (e) {
+                        is TodoError.Unauthorized -> {}
+                        is TodoError.EmptyTitle -> titleError.value = "Name cannot be empty"
+                        is TodoError.TitleTooLong -> titleError.value = "Name is too long (max 100 characters)"
+                        else -> formError.value = "Something went wrong"
+                    }
+                },
+            )
+        }
+    }
+
     fun onDelete(id: Long) {
-        val userId = currentUserId.value ?: return
-        viewModelScope.launch { deleteItem(id, userId) }
+        val uid = userId ?: return
+        viewModelScope.launch {
+            deleteItem(id, uid).onSuccess {
+                _items.value = _items.value.filter { it.id != id }
+            }
+        }
     }
 
     class Factory(
-        private val observeItems: ObserveTodoItemsUseCase,
+        private val getItems: GetTodoItemsUseCase,
         private val addItem: AddTodoItemUseCase,
         private val editItem: EditTodoItemUseCase,
         private val toggleItem: ToggleTodoItemUseCase,
@@ -125,7 +143,7 @@ class TodoListViewModel(
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>): T =
             TodoListViewModel(
-                observeItems, addItem, editItem, toggleItem, deleteItem, validator, sessionRepository,
+                getItems, addItem, editItem, toggleItem, deleteItem, validator, sessionRepository,
             ) as T
     }
 }

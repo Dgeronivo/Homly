@@ -4,7 +4,6 @@ import com.dgero.homly.todolist.domain.error.TodoError
 import com.dgero.homly.todolist.domain.model.TodoLimits
 import com.dgero.homly.todolist.domain.validation.TodoTitleValidator
 import com.dgero.homly.todolist.fake.FakeTodoRepository
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -36,7 +35,7 @@ class EditTodoItemUseCaseTest {
         val item = addUseCase(userId, "original").getOrThrow()
         val result = useCase(item.id, userId, "  updated  ")
         assertEquals(Result.success(Unit), result)
-        val stored = repo.getItems(userId).first().first { it.id == item.id }
+        val stored = repo.getItems(userId).first { it.id == item.id }
         assertEquals("updated", stored.title)
     }
 

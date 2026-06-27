@@ -7,16 +7,13 @@ import com.dgero.homly.todolist.domain.error.TodoError
 import com.dgero.homly.todolist.domain.model.TodoItem
 import com.dgero.homly.todolist.domain.model.TodoLimits
 import com.dgero.homly.todolist.domain.repository.TodoRepository
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
-
 class LocalTodoRepository(
     private val dao: TodoItemDao,
     private val runTransaction: TransactionRunner,
 ) : TodoRepository {
 
-    override fun getItems(userId: Long): Flow<List<TodoItem>> =
-        dao.getByUser(userId).map { entities -> entities.map { it.toDomain() } }
+    override suspend fun getItems(userId: Long): List<TodoItem> =
+        dao.getByUser(userId).map { it.toDomain() }
 
     override suspend fun add(userId: Long, title: String): Result<TodoItem> = try {
         val item = runTransaction {

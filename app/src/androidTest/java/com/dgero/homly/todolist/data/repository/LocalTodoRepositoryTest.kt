@@ -8,7 +8,6 @@ import com.dgero.homly.auth.data.repository.TransactionRunner
 import com.dgero.homly.core.data.HomlyDatabase
 import com.dgero.homly.todolist.domain.error.TodoError
 import com.dgero.homly.todolist.domain.model.TodoLimits
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -45,8 +44,8 @@ class LocalTodoRepositoryTest {
         repository.add(1, "Task A")
         repository.add(2, "Task B")
 
-        val user1 = repository.getItems(1).first()
-        val user2 = repository.getItems(2).first()
+        val user1 = repository.getItems(1)
+        val user2 = repository.getItems(2)
         assertEquals(listOf("Task A"), user1.map { it.title })
         assertEquals(listOf("Task B"), user2.map { it.title })
     }

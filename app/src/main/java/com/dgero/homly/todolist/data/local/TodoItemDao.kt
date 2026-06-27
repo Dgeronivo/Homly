@@ -3,12 +3,10 @@ package com.dgero.homly.todolist.data.local
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
-import kotlinx.coroutines.flow.Flow
-
 @Dao
 interface TodoItemDao {
     @Query("SELECT * FROM todo_items WHERE userId = :userId")
-    fun getByUser(userId: Long): Flow<List<TodoItemEntity>>
+    suspend fun getByUser(userId: Long): List<TodoItemEntity>
 
     @Query("SELECT COUNT(*) FROM todo_items WHERE userId = :userId")
     suspend fun countByUser(userId: Long): Int

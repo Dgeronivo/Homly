@@ -3,7 +3,6 @@ package com.dgero.homly.todolist.domain.usecase
 import com.dgero.homly.todolist.domain.error.TodoError
 import com.dgero.homly.todolist.domain.validation.TodoTitleValidator
 import com.dgero.homly.todolist.fake.FakeTodoRepository
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -21,7 +20,7 @@ class ToggleTodoItemUseCaseTest {
         val item = addUseCase(userId, "task").getOrThrow()
         val result = useCase(item.id, userId, true)
         assertTrue(result.isSuccess)
-        val stored = repo.getItems(userId).first().first { it.id == item.id }
+        val stored = repo.getItems(userId).first { it.id == item.id }
         assertEquals(true, stored.isDone)
     }
 

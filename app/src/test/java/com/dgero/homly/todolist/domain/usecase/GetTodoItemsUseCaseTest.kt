@@ -2,12 +2,11 @@ package com.dgero.homly.todolist.domain.usecase
 
 import com.dgero.homly.todolist.domain.model.TodoItem
 import com.dgero.homly.todolist.fake.FakeTodoRepository
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
-class ObserveTodoItemsUseCaseTest {
+class GetTodoItemsUseCaseTest {
 
     private val userId = 1L
 
@@ -31,7 +30,7 @@ class ObserveTodoItemsUseCaseTest {
         repo.seedItem(userId, TodoItem(id = 4,  title = "nd-4", isDone = false, createdAt = 400))
         repo.seedItem(userId, TodoItem(id = 7,  title = "d-2",  isDone = true,  createdAt = 20))
 
-        val result = ObserveTodoItemsUseCase(repo)(userId).first()
+        val result = GetTodoItemsUseCase(repo)(userId)
 
         val expected = listOf("nd-5", "nd-4", "nd-3", "nd-2", "nd-1", "d-5", "d-4", "d-3", "d-2", "d-1")
         assertEquals(expected, result.map { it.title })

@@ -31,7 +31,7 @@ import com.dgero.homly.shopping.presentation.ShoppingListViewModel
 import com.dgero.homly.todolist.domain.usecase.AddTodoItemUseCase
 import com.dgero.homly.todolist.domain.usecase.DeleteTodoItemUseCase
 import com.dgero.homly.todolist.domain.usecase.EditTodoItemUseCase
-import com.dgero.homly.todolist.domain.usecase.ObserveTodoItemsUseCase
+import com.dgero.homly.todolist.domain.usecase.GetTodoItemsUseCase
 import com.dgero.homly.todolist.domain.usecase.ToggleTodoItemUseCase
 import com.dgero.homly.todolist.domain.validation.TodoTitleValidator
 import com.dgero.homly.todolist.presentation.TodoListScreen
@@ -102,7 +102,7 @@ private fun AuthGate(container: AppContainer) {
                 composable("todo-list") {
                     val vm: TodoListViewModel = viewModel(
                         factory = TodoListViewModel.Factory(
-                            observeItems = ObserveTodoItemsUseCase(container.todoRepository),
+                            getItems = GetTodoItemsUseCase(container.todoRepository),
                             addItem = AddTodoItemUseCase(container.todoRepository, TodoTitleValidator),
                             editItem = EditTodoItemUseCase(container.todoRepository, TodoTitleValidator),
                             toggleItem = ToggleTodoItemUseCase(container.todoRepository),
