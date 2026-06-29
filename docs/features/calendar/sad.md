@@ -115,8 +115,7 @@ com.dgero.homly/calendar/
 │   ├── repository/
 │   │   └── CalendarEventRepository.kt  (interface)
 │   ├── usecase/
-│   │   ├── GetEventsForMonthUseCase.kt
-│   │   ├── GetEventsForDateUseCase.kt
+│   │   ├── GetEventsUseCase.kt
 │   │   ├── CreateEventUseCase.kt
 │   │   ├── UpdateEventUseCase.kt
 │   │   └── DeleteEventUseCase.kt
@@ -165,26 +164,29 @@ C4Container
 
 ## 6. Runtime view
 
-**Flow 1: Переглянути події дня**
+**Flow 1: Переглянути події місяця і дня**
 
 ```mermaid
 sequenceDiagram
     actor User
     participant CalendarScreen
     participant CalendarViewModel
-    participant GetEventsForDateUseCase
+    participant GetEventsUseCase
     participant LocalCalendarEventRepository
     participant CalendarEventDao
 
-    User->>CalendarScreen: обирає дату у місячному grid
-    CalendarScreen->>CalendarViewModel: onDateSelected(date: LocalDate)
-    CalendarViewModel->>GetEventsForDateUseCase: invoke(userId, date)
-    GetEventsForDateUseCase->>LocalCalendarEventRepository: getEventsForDate(userId, date)
-    LocalCalendarEventRepository->>CalendarEventDao: getEventsForDate(userId, date)
+    User->>CalendarScreen: відкриває calendar або змінює місяць
+    CalendarScreen->>CalendarViewModel: onMonthChanged(yearMonth)
+    CalendarViewModel->>GetEventsUseCase: invoke(userId, yearMonth)
+    GetEventsUseCase->>LocalCalendarEventRepository: getEventsForMonth(userId, yearMonth)
+    LocalCalendarEventRepository->>CalendarEventDao: getEventsForMonth(userId, yearMonth)
     CalendarEventDao-->>LocalCalendarEventRepository: List<CalendarEventEntity>
-    LocalCalendarEventRepository-->>GetEventsForDateUseCase: List<CalendarEvent>
-    GetEventsForDateUseCase-->>CalendarViewModel: sorted(allDay first, then by startTime)
-    CalendarViewModel-->>CalendarScreen: uiState.events оновлено
+    LocalCalendarEventRepository-->>GetEventsUseCase: List<CalendarEvent>
+    GetEventsUseCase-->>CalendarViewModel: List<CalendarEvent>
+    CalendarViewModel-->>CalendarScreen: uiState(daysWithEvents, selectedDayEvents sorted)
+    User->>CalendarScreen: обирає день у grid
+    CalendarScreen->>CalendarViewModel: onDateSelected(date: LocalDate)
+    CalendarViewModel-->>CalendarScreen: фільтрує з завантаженого списку, оновлює selectedDayEvents
 ```
 
 **Flow 2: Створити timed event (happy path)**
