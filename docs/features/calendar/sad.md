@@ -161,7 +161,89 @@ C4Container
 
 ## 6. Runtime view
 
-<!-- TBD — Socratic pass §6 -->
+**Flow 1: Переглянути події дня**
+
+```mermaid
+sequenceDiagram
+    actor User
+    participant CalendarScreen
+    participant CalendarViewModel
+    participant GetEventsForDateUseCase
+    participant LocalCalendarEventRepository
+    participant CalendarEventDao
+
+    User->>CalendarScreen: обирає дату у місячному grid
+    CalendarScreen->>CalendarViewModel: onDateSelected(date: LocalDate)
+    CalendarViewModel->>GetEventsForDateUseCase: invoke(userId, date)
+    GetEventsForDateUseCase->>LocalCalendarEventRepository: getEventsForDate(userId, date)
+    LocalCalendarEventRepository->>CalendarEventDao: getEventsForDate(userId, date)
+    CalendarEventDao-->>LocalCalendarEventRepository: List<CalendarEventEntity>
+    LocalCalendarEventRepository-->>GetEventsForDateUseCase: List<CalendarEvent>
+    GetEventsForDateUseCase-->>CalendarViewModel: sorted(allDay first, then by startTime)
+    CalendarViewModel-->>CalendarScreen: uiState.events оновлено
+```
+
+**Flow 2: Створити timed event (happy path)**
+
+```mermaid
+sequenceDiagram
+    actor User
+    participant AddEditEventScreen
+    participant AddEditEventViewModel
+    participant CreateEventUseCase
+    participant CalendarEventValidator
+    participant LocalCalendarEventRepository
+
+    User->>AddEditEventScreen: заповнює title, date, startTime, endTime → Save
+    AddEditEventScreen->>AddEditEventViewModel: onSave(draft)
+    AddEditEventViewModel->>CreateEventUseCase: invoke(userId, draft)
+    CreateEventUseCase->>CalendarEventValidator: validate(draft)
+    CalendarEventValidator-->>CreateEventUseCase: Valid
+    CreateEventUseCase->>LocalCalendarEventRepository: getEventCount(userId)
+    LocalCalendarEventRepository-->>CreateEventUseCase: count < 100
+    CreateEventUseCase->>LocalCalendarEventRepository: create(event)
+    LocalCalendarEventRepository-->>CreateEventUseCase: ok
+    CreateEventUseCase-->>AddEditEventViewModel: Result.Success
+    AddEditEventViewModel-->>AddEditEventScreen: navigateBack()
+```
+
+**Flow 3: Збій валідації (endTime ≤ startTime)**
+
+```mermaid
+sequenceDiagram
+    actor User
+    participant AddEditEventScreen
+    participant AddEditEventViewModel
+    participant CreateEventUseCase
+    participant CalendarEventValidator
+
+    User->>AddEditEventScreen: endTime ≤ startTime → Save
+    AddEditEventScreen->>AddEditEventViewModel: onSave(draft)
+    AddEditEventViewModel->>CreateEventUseCase: invoke(userId, draft)
+    CreateEventUseCase->>CalendarEventValidator: validate(draft)
+    CalendarEventValidator-->>CreateEventUseCase: CalendarError.EndNotAfterStart
+    CreateEventUseCase-->>AddEditEventViewModel: Result.Failure(error)
+    AddEditEventViewModel-->>AddEditEventScreen: показує inline error під полем endTime
+```
+
+**Flow 4: Ліміт подій вичерпано (MAX_EVENTS = 100)**
+
+```mermaid
+sequenceDiagram
+    actor User
+    participant CalendarScreen
+    participant CalendarViewModel
+    participant CreateEventUseCase
+    participant LocalCalendarEventRepository
+
+    User->>CalendarScreen: натискає FAB "+" при count = 100
+    CalendarScreen->>CalendarViewModel: onAddEvent()
+    CalendarViewModel->>CreateEventUseCase: checkCanCreate(userId)
+    CreateEventUseCase->>LocalCalendarEventRepository: getEventCount(userId)
+    LocalCalendarEventRepository-->>CreateEventUseCase: 100
+    CreateEventUseCase-->>CalendarViewModel: Result.Failure(CalendarError.EventLimitReached)
+    CalendarViewModel-->>CalendarScreen: показує Snackbar з повідомленням про ліміт
+```
 
 ## 7. Deployment view
 
