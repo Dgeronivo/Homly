@@ -24,6 +24,10 @@ ticket: ""
 2. **Domain integrity** — всі domain-invariants (MAX_EVENTS=100, endTime > startTime, title непорожній і ≤100 символів) перевіряються у domain-шарі до будь-якого запису *(PRD §8, AC-07, AC-07b, AC-08, AC-09)*
 3. **Calendar correctness** — після вибору дня all-day події відображаються першими, timed — відсортовані за startTime ascending *(AC-01, AC-03, AC-04)*
 
+**Decision overrides (critic pass 2026-06-29).**
+- Critic F5-1 (§6 flows rendered as prose) — overridden by author, rationale: critic received a condensed prompt representation of §6; actual sad.md contains 4 proper fenced `sequenceDiagram` blocks (Flow 1–4).
+- Critic F5-2 (PRD AC-12 unauthenticated redirect not documented) — overridden by author, rationale: AC-12 is enforced by the auth module's existing NavHost guard; calendar module does not own authentication and documenting it here would duplicate auth module responsibility.
+
 **Stakeholders.**
 
 | Role | Interest | Sign-off owner? |
@@ -190,12 +194,15 @@ sequenceDiagram
     actor User
     participant AddEditEventScreen
     participant AddEditEventViewModel
+    participant DataStoreSessionRepository
     participant CreateEventUseCase
     participant CalendarEventValidator
     participant LocalCalendarEventRepository
 
     User->>AddEditEventScreen: заповнює title, date, startTime, endTime → Save
     AddEditEventScreen->>AddEditEventViewModel: onSave(draft)
+    AddEditEventViewModel->>DataStoreSessionRepository: getCurrentUserId()
+    DataStoreSessionRepository-->>AddEditEventViewModel: userId
     AddEditEventViewModel->>CreateEventUseCase: invoke(userId, draft)
     CreateEventUseCase->>CalendarEventValidator: validate(draft)
     CalendarEventValidator-->>CreateEventUseCase: Valid
@@ -271,8 +278,6 @@ sequenceDiagram
 | Observability | <!-- N/A: прототип --> | — |
 
 ## 9. Architecture decisions
-
-<!-- TBD — auto-populated during Socratic pass as ADRs spawn -->
 
 | # | Title | Status | Section |
 |---|---|---|---|
