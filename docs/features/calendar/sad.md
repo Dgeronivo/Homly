@@ -247,11 +247,28 @@ sequenceDiagram
 
 ## 7. Deployment view
 
-<!-- TBD — Socratic pass §7 -->
+Застосунок — єдиний Android-процес (`com.dgero.homly`), встановлений на пристрій користувача. Немає backend-сервера, хмарної інфраструктури чи окремих сервісів — calendar module виконується в тому самому процесі, що і todo/shopping/auth. Дані зберігаються локально в Room DB (`homly.db`) на internal storage пристрою.
+
+**Monitoring:** <!-- N/A: прототип без crash-репортингу і аналітики -->
+
+**Scaling thresholds:** <!-- N/A: 2–6 членів сім'ї, локальна SQLite, MAX_EVENTS=100 -->
+
+**Deployment topology:** single APK, один пристрій на user.
 
 ## 8. Crosscutting concepts
 
-<!-- TBD — Socratic pass §8 -->
+| Concept | Convention | Where defined |
+|---|---|---|
+| Auth / Session | `DataStoreSessionRepository.currentUserId` — передається у use cases; DAO фільтрує за ним | auth module (ADR-0002) |
+| Error handling | `sealed class CalendarError` у `domain/error/`; ViewModel маппить у UI state | per todolist pattern |
+| Validation | `CalendarEventValidator` у `domain/validation/`; повертає `CalendarError` | per todolist pattern |
+| ID strategy | Room `@PrimaryKey(autoGenerate = true)` — Long; нові ID генерує DB | existing entity pattern |
+| Domain limits | `object CalendarLimits { const val MAX_EVENTS = 100 }` у `domain/` | PRD §8 |
+| State management | `StateFlow` у ViewModel; `collectAsStateWithLifecycle()` у Composable | ARCHITECTURE.md |
+| Persistence | Room TypeConverters для `LocalDate`↔`Long` (epochDay) і `LocalTime`↔`Int` (secondOfDay) у `DateTimeConverters.kt` | §5 SAD (ADR-0003) |
+| Logging | <!-- N/A: прототип, без structured logging --> | — |
+| Internationalization | <!-- N/A: UI-рядки захардкоджені українською --> | — |
+| Observability | <!-- N/A: прототип --> | — |
 
 ## 9. Architecture decisions
 
@@ -265,17 +282,52 @@ sequenceDiagram
 
 ## 10. Quality requirements
 
-<!-- TBD — Socratic pass §10 -->
+*(Числові NFR не задані — PRD §6 «N/A — prototype». Сценарії виведені з QG §1 + AC PRD §5.)*
+
+**QG-1. Data isolation** *(AC-10, PRD §6.1)*
+
+- **When:** у Room DB є події двох різних `userId`; авторизований `currentUserId = 1`
+- **Then:** `CalendarEventDao.getEventsForDate(userId=1, date)` повертає лише рядки з `userId=1`; жоден рядок з `userId=2` не з'являється
+- **How verify:** unit-тест `CalendarEventDaoTest` — insert подій двох userId, перевірити що query повертає виключно рядки першого
+
+**QG-2. Domain integrity** *(AC-07, AC-07b, AC-08, AC-09)*
+
+- **When:** `CalendarEventValidator.validate()` отримує чернетку з порушеним інваріантом (порожній title / title >100 символів / endTime ≤ startTime / кількість подій = 100 і спроба create)
+- **Then:** validator повертає відповідний `CalendarError`; жоден запис не пишеться у Room DB
+- **How verify:** unit-тести `CalendarEventValidatorTest` — по одному тесту на кожен `CalendarError` variant
+
+**QG-3. Calendar correctness** *(AC-01, AC-03, AC-04)*
+
+- **When:** `GetEventsForDateUseCase` отримує мікс з all-day і timed подій різного startTime
+- **Then:** результуючий список містить all-day першими, потім timed у порядку зростання startTime
+- **How verify:** unit-тест `GetEventsForDateUseCaseTest` зі stub-репозиторієм і перевіркою порядку елементів у списку
 
 ## 11. Risks and technical debt
 
-<!-- TBD — Socratic pass §11 -->
-
 | Risk / debt | Severity | Mitigation | Owner |
 |---|---|---|---|
+| `fallbackToDestructiveMigration` залишається активним — при помилці у Migration(3→4) Room знищить всі дані | Medium | Покрити Migration(3→4) unit-тестом (`MigrationTest`); перевіряти schema перед релізом | Alex |
+| Спільний сімейний доступ до подій (family sharing) відсутній у v1 — per-user only | Low | Accepted by design (PRD §3); буде у family-module фазі | Alex |
+| minSdk 29 відсікає Android 7–9 (API 24–28) | Low | Accepted for prototype (ADR-0003); переглянути при виході за межі prototype | Alex |
+| Рядки UI захардкоджені українською — без string resources | Low | Acceptable for prototype; extraction до `strings.xml` перед production | Alex |
 
 **Accepted debt (acceptable in v1, plan to fix later):**
+- Відсутній crash-репортинг і аналітика (prototype)
+- Рядки не у `strings.xml` (prototype; потрібно перед internationalisation)
+- Відсутні recurring events і reminders (PRD §3 Non-goals)
 
 ## 12. Glossary
 
-<!-- TBD — auto-extract during Socratic pass -->
+*(Базові терміни — з `docs/features/calendar/CONTEXT.md`. Технічні терміни — додані в рамках цього SAD.)*
+
+| Term | Meaning |
+|---|---|
+| event | Запланована подія, що або відбувається у визначені часові межі, або триває цілий день *(CONTEXT.md)* |
+| all-day event | Подія без конкретного часу початку і кінця, займає весь день *(CONTEXT.md)* |
+| timed event | Подія з явно заданим часом початку і кінця в межах одного дня *(CONTEXT.md)* |
+| user | Окрема людина — член family з власним профілем у застосунку *(CONTEXT.md)* |
+| family | Група людей зі спільним доступом до подій один одного; shared-доступ — у наступній фазі *(CONTEXT.md)* |
+| CalendarError | `sealed class` у `domain/error/`: EmptyTitle / TitleTooLong / EndNotAfterStart / EventLimitReached |
+| CalendarLimits | `object` у `domain/` з `const val MAX_EVENTS = 100` (PRD §8, resolved 2026-06-28) |
+| DateTimeConverters | Room `@TypeConverter` клас: `LocalDate` ↔ `Long` (epochDay), `LocalTime` ↔ `Int` (secondOfDay) |
+| Migration(3→4) | Явна Room DB міграція — `CREATE TABLE calendar_events (...)` при version bump 3→4 (ADR-0001) |
