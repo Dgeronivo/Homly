@@ -36,7 +36,7 @@ ticket: ""
 
 **Technical.**
 - Kotlin 2.2.10 + Coroutines
-- Android SDK: Min 24 (Android 7.0) / Target+Compile 36 (Android 15)
+- Android SDK: Min **29** (Android 10) / Target+Compile 36 (Android 15) *(підняли з 24 — ADR-0003)*
 - AGP 9.2.1 · KSP 2.2.10-2.0.2
 - Jetpack Compose BOM 2026.02.01 + Material3
 - Room 2.7.1 (KSP-generated DAOs) — HomlyDatabase version 3→**4** (нова таблиця `calendar_events`)
@@ -94,7 +94,70 @@ C4Context
 
 ## 5. Building block view
 
-<!-- TBD — Socratic pass §5 -->
+Layered MVVM (Clean Architecture) — той самий стиль, що `todolist/` і `shopping/`. Domain layer — pure Kotlin без Android SDK; presentation — Compose + ViewModel зі `StateFlow`; data — Room DAO + Repository. Дати і час представлені через `java.time.LocalDate` / `LocalTime` нативно (minSdk 29, ADR-0003) — без `coreLibraryDesugaring`.
+
+**Структура пакетів:**
+
+```
+com.dgero.homly/calendar/
+├── presentation/
+│   ├── CalendarScreen.kt          # місячний grid (верхня частина) + список подій дня (нижня); FAB (+)
+│   ├── CalendarViewModel.kt
+│   ├── AddEditEventScreen.kt      # форма create/edit (eventId: Long? = null)
+│   └── AddEditEventViewModel.kt
+├── domain/
+│   ├── model/
+│   │   └── CalendarEvent.kt       # id, userId, title, date: LocalDate, isAllDay, startTime: LocalTime?, endTime: LocalTime?
+│   ├── repository/
+│   │   └── CalendarEventRepository.kt  (interface)
+│   ├── usecase/
+│   │   ├── GetEventsForMonthUseCase.kt
+│   │   ├── GetEventsForDateUseCase.kt
+│   │   ├── CreateEventUseCase.kt
+│   │   ├── UpdateEventUseCase.kt
+│   │   └── DeleteEventUseCase.kt
+│   ├── error/
+│   │   └── CalendarError.kt       # sealed class: EmptyTitle | TitleTooLong | EndNotAfterStart | EventLimitReached
+│   └── validation/
+│       └── CalendarEventValidator.kt
+└── data/
+    ├── local/
+    │   ├── CalendarEventEntity.kt  # Room entity — таблиця calendar_events; TypeConverters для LocalDate/LocalTime
+    │   ├── CalendarEventDao.kt     # @Query з WHERE userId = :userId (ADR-0002)
+    │   └── DateTimeConverters.kt   # @TypeConverter: LocalDate↔Long (epochDay), LocalTime↔Int (secondOfDay)
+    └── repository/
+        └── LocalCalendarEventRepository.kt
+```
+
+**C4 Container (L2):**
+
+```mermaid
+C4Container
+    title Homly App — Calendar module
+
+    Person(user, "User")
+
+    Container_Boundary(app, "Homly Android App") {
+        Container(calScreen, "CalendarScreen", "Compose + CalendarViewModel", "Місячний grid + список подій дня")
+        Container(addEditScreen, "AddEditEventScreen", "Compose + AddEditEventViewModel", "Форма створення / редагування події")
+        Container(calDomain, "calendar domain", "Kotlin", "Use cases, CalendarEvent, CalendarError, CalendarEventValidator")
+        Container(calData, "calendar data", "Room / Kotlin", "CalendarEventDao, LocalCalendarEventRepository, DateTimeConverters")
+        Container(nav, "NavHost (MainActivity)", "Navigation Compose", "маршрути: calendar, calendar/add, calendar/edit/{id}")
+    }
+
+    ContainerDb(db, "homly.db (Room v4)", "SQLite", "calendar_events + todo_items + shopping_items + users")
+    Container(session, "DataStore Preferences", "DataStore", "currentUserId")
+
+    Rel(user, calScreen, "переглядає calendar", "Compose UI")
+    Rel(user, addEditScreen, "створює / редагує подію", "Compose UI")
+    Rel(nav, calScreen, "navigate('calendar')")
+    Rel(nav, addEditScreen, "navigate('calendar/add') або navigate('calendar/edit/{id}')")
+    Rel(calScreen, calDomain, "викликає use cases")
+    Rel(addEditScreen, calDomain, "викликає use cases")
+    Rel(calDomain, calData, "CalendarEventRepository interface")
+    Rel(calData, db, "Room DAO queries", "SQLite")
+    Rel(calData, session, "читає currentUserId", "DataStore")
+```
 
 ## 6. Runtime view
 
@@ -116,6 +179,7 @@ C4Context
 |---|---|---|---|
 | 0001 | Use proper Room Migration for calendar_events schema change | Accepted | §4 |
 | 0002 | Enforce per-user event filtering at DAO level | Accepted | §4 |
+| 0003 | Raise minSdk to 29 for native java.time support | Accepted | §2, §5 |
 
 ## 10. Quality requirements
 
