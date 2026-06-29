@@ -86,7 +86,11 @@ C4Context
 
 ## 4. Solution strategy
 
-<!-- TBD — Socratic pass §4 -->
+**SC-1: Follow existing MVVM feature module pattern** — нова папка `calendar/` зі стандартним layout `presentation/domain/data`, manual wiring через `AppContainer`. Відхилення не потрібне: idea-brief §8 фіксує «events структурно ідентичні todo+shopping плюс datetime-поля». *(inline — конвенція ARCHITECTURE.md)*
+
+**SC-2: Розширити `HomlyDatabase` з явною Migration(3→4)** — таблиця `calendar_events` додається до єдиної Room-бази; version bump 3→4 через `Migration(3, 4)` з `CREATE TABLE`. Альтернатива `fallbackToDestructiveMigration` відхилена — втрата todo/shopping-даних неприйнятна навіть для прототипу. *(→ ADR-0001)*
+
+**SC-3: Enforce per-user filtering at DAO level** — кожен DAO-метод на читання містить `WHERE userId = :userId`. Defense in depth: security-invariant не залежить від коректності use-case. Узгоджено з паттерном `TodoItemEntity`/`ShoppingItemEntity`. *(→ ADR-0002)*
 
 ## 5. Building block view
 
@@ -110,6 +114,8 @@ C4Context
 
 | # | Title | Status | Section |
 |---|---|---|---|
+| 0001 | Use proper Room Migration for calendar_events schema change | Accepted | §4 |
+| 0002 | Enforce per-user event filtering at DAO level | Accepted | §4 |
 
 ## 10. Quality requirements
 
