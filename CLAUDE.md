@@ -23,7 +23,7 @@ When given a new requirement:
 
 ## Build & SDK
 
-- **Min SDK**: 24 (Android 7.0) — do not use APIs below this without a compatibility check.
+- **Min SDK**: 29 (Android 10) — do not use APIs below this without a compatibility check. Raised from 24 for native `java.time` support (see [ADR-0003](docs/features/calendar/adr/0003-raise-min-sdk-to-29-for-native-java-time.md)).
 - **Target/Compile SDK**: 36 (Android 15).
 - **Build**: `make build`
 - **Unit tests**: `make test`
