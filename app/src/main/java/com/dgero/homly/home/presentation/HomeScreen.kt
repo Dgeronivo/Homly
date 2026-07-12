@@ -22,6 +22,7 @@ fun HomeScreen(
     viewModel: HomeViewModel,
     onOpenShoppingList: () -> Unit,
     onOpenTodoList: () -> Unit,
+    onOpenCalendar: () -> Unit,
     onLogout: () -> Unit,
 ) {
     val login by viewModel.login.collectAsStateWithLifecycle()
@@ -30,6 +31,7 @@ fun HomeScreen(
         login = login,
         onOpenShoppingList = onOpenShoppingList,
         onOpenTodoList = onOpenTodoList,
+        onOpenCalendar = onOpenCalendar,
         onLogout = { viewModel.onLogout(onLogout) },
     )
 }
@@ -39,6 +41,7 @@ private fun HomeContent(
     login: String,
     onOpenShoppingList: () -> Unit,
     onOpenTodoList: () -> Unit,
+    onOpenCalendar: () -> Unit,
     onLogout: () -> Unit,
 ) {
     Column(
@@ -56,6 +59,10 @@ private fun HomeContent(
             Text("Todo list")
         }
         Spacer(Modifier.height(8.dp))
+        Button(onClick = onOpenCalendar) {
+            Text("Calendar")
+        }
+        Spacer(Modifier.height(8.dp))
         Button(onClick = onLogout) {
             Text("Log out")
         }
@@ -66,6 +73,12 @@ private fun HomeContent(
 @Composable
 private fun HomeContentPreview() {
     HomlyTheme {
-        HomeContent(login = "alex", onOpenShoppingList = {}, onOpenTodoList = {}, onLogout = {})
+        HomeContent(
+            login = "alex",
+            onOpenShoppingList = {},
+            onOpenTodoList = {},
+            onOpenCalendar = {},
+            onLogout = {},
+        )
     }
 }

@@ -14,11 +14,22 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.dgero.homly.auth.domain.usecase.LogoutUseCase
 import com.dgero.homly.auth.presentation.authGraph
+import com.dgero.homly.calendar.domain.usecase.CreateEventUseCase
+import com.dgero.homly.calendar.domain.usecase.DeleteEventUseCase
+import com.dgero.homly.calendar.domain.usecase.GetEventByIdUseCase
+import com.dgero.homly.calendar.domain.usecase.GetEventsUseCase
+import com.dgero.homly.calendar.domain.usecase.UpdateEventUseCase
+import com.dgero.homly.calendar.presentation.AddEditEventScreen
+import com.dgero.homly.calendar.presentation.AddEditEventViewModel
+import com.dgero.homly.calendar.presentation.CalendarScreen
+import com.dgero.homly.calendar.presentation.CalendarViewModel
 import com.dgero.homly.home.presentation.HomeScreen
 import com.dgero.homly.home.presentation.HomeViewModel
 import com.dgero.homly.shopping.domain.usecase.AddShoppingItemUseCase
@@ -92,6 +103,7 @@ private fun AuthGate(container: AppContainer) {
                         viewModel = vm,
                         onOpenShoppingList = { navController.navigate("shopping") },
                         onOpenTodoList = { navController.navigate("todo-list") },
+                        onOpenCalendar = { navController.navigate("calendar") },
                         onLogout = {
                             navController.navigate("auth") {
                                 popUpTo("home") { inclusive = true }
@@ -128,6 +140,55 @@ private fun AuthGate(container: AppContainer) {
                         )
                     )
                     ShoppingListScreen(
+                        viewModel = vm,
+                        onBack = { navController.popBackStack() },
+                    )
+                }
+                composable("calendar") {
+                    val vm: CalendarViewModel = viewModel(
+                        factory = CalendarViewModel.Factory(
+                            getEvents = GetEventsUseCase(container.calendarEventRepository),
+                            deleteEvent = DeleteEventUseCase(container.calendarEventRepository),
+                            createEvent = CreateEventUseCase(container.calendarEventRepository),
+                            sessionRepository = container.sessionRepository,
+                        )
+                    )
+                    CalendarScreen(
+                        viewModel = vm,
+                        onAddEvent = { navController.navigate("calendar/add") },
+                        onEventClick = { id -> navController.navigate("calendar/edit/$id") },
+                    )
+                }
+                composable("calendar/add") {
+                    val vm: AddEditEventViewModel = viewModel(
+                        factory = AddEditEventViewModel.Factory(
+                            eventId = null,
+                            createEvent = CreateEventUseCase(container.calendarEventRepository),
+                            updateEvent = UpdateEventUseCase(container.calendarEventRepository),
+                            getEventById = GetEventByIdUseCase(container.calendarEventRepository),
+                            sessionRepository = container.sessionRepository,
+                        )
+                    )
+                    AddEditEventScreen(
+                        viewModel = vm,
+                        onBack = { navController.popBackStack() },
+                    )
+                }
+                composable(
+                    "calendar/edit/{id}",
+                    arguments = listOf(navArgument("id") { type = NavType.LongType }),
+                ) { backStackEntry ->
+                    val eventId = backStackEntry.arguments?.getLong("id")
+                    val vm: AddEditEventViewModel = viewModel(
+                        factory = AddEditEventViewModel.Factory(
+                            eventId = eventId,
+                            createEvent = CreateEventUseCase(container.calendarEventRepository),
+                            updateEvent = UpdateEventUseCase(container.calendarEventRepository),
+                            getEventById = GetEventByIdUseCase(container.calendarEventRepository),
+                            sessionRepository = container.sessionRepository,
+                        )
+                    )
+                    AddEditEventScreen(
                         viewModel = vm,
                         onBack = { navController.popBackStack() },
                     )
