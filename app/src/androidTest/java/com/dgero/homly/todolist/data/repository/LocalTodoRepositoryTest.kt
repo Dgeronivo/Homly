@@ -59,7 +59,7 @@ class LocalTodoRepositoryTest {
         val result = repository.add(1, "overflow")
 
         assertEquals(TodoError.LimitReached, result.exceptionOrNull())
-        assertEquals(TodoLimits.MAX_ITEMS, repository.getItems(1).first().size)
+        assertEquals(TodoLimits.MAX_ITEMS, repository.getItems(1).size)
     }
 
     @Test
@@ -78,7 +78,7 @@ class LocalTodoRepositoryTest {
 
         repository.editTitle(added.id, 1, "New title")
 
-        val item = repository.getItems(1).first().single()
+        val item = repository.getItems(1).single()
         assertEquals("New title", item.title)
         assertEquals(added.createdAt, item.createdAt)
         assertEquals(false, item.isDone)
@@ -91,7 +91,7 @@ class LocalTodoRepositoryTest {
         val result = repository.editTitle(added.id, 2, "Hacked")
 
         assertEquals(TodoError.Unauthorized, result.exceptionOrNull())
-        assertEquals("My task", repository.getItems(1).first().single().title)
+        assertEquals("My task", repository.getItems(1).single().title)
     }
 
     @Test
@@ -100,7 +100,7 @@ class LocalTodoRepositoryTest {
 
         repository.toggleDone(added.id, 1, true)
 
-        assertTrue(repository.getItems(1).first().single().isDone)
+        assertTrue(repository.getItems(1).single().isDone)
     }
 
     @Test
@@ -110,7 +110,7 @@ class LocalTodoRepositoryTest {
         val result = repository.toggleDone(added.id, 2, true)
 
         assertEquals(TodoError.Unauthorized, result.exceptionOrNull())
-        assertEquals(false, repository.getItems(1).first().single().isDone)
+        assertEquals(false, repository.getItems(1).single().isDone)
     }
 
     @Test
@@ -119,7 +119,7 @@ class LocalTodoRepositoryTest {
 
         repository.delete(added.id, 1)
 
-        assertTrue(repository.getItems(1).first().isEmpty())
+        assertTrue(repository.getItems(1).isEmpty())
     }
 
     @Test
@@ -129,6 +129,6 @@ class LocalTodoRepositoryTest {
         val result = repository.delete(added.id, 2)
 
         assertEquals(TodoError.Unauthorized, result.exceptionOrNull())
-        assertEquals(1, repository.getItems(1).first().size)
+        assertEquals(1, repository.getItems(1).size)
     }
 }

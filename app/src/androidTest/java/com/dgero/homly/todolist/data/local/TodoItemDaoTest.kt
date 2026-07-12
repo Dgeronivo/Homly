@@ -68,7 +68,7 @@ class TodoItemDaoTest {
         val rows = dao.updateTitle(id, 1, "New title")
 
         assertEquals(1, rows)
-        assertEquals("New title", dao.getByUser(1).first().single().title)
+        assertEquals("New title", dao.getByUser(1).single().title)
     }
 
     @Test
@@ -78,7 +78,7 @@ class TodoItemDaoTest {
         val rows = dao.updateTitle(id, 2, "Hacked")
 
         assertEquals(0, rows)
-        assertEquals("Original", dao.getByUser(1).first().single().title)
+        assertEquals("Original", dao.getByUser(1).single().title)
     }
 
     @Test
@@ -88,7 +88,7 @@ class TodoItemDaoTest {
         val rows = dao.updateDone(id, 1, true)
 
         assertEquals(1, rows)
-        assertEquals(true, dao.getByUser(1).first().single().isDone)
+        assertEquals(true, dao.getByUser(1).single().isDone)
     }
 
     @Test
@@ -98,7 +98,7 @@ class TodoItemDaoTest {
         val rows = dao.updateDone(id, 2, true)
 
         assertEquals(0, rows)
-        assertEquals(false, dao.getByUser(1).first().single().isDone)
+        assertEquals(false, dao.getByUser(1).single().isDone)
     }
 
     @Test
@@ -108,7 +108,7 @@ class TodoItemDaoTest {
         val rows = dao.deleteById(id, 1)
 
         assertEquals(1, rows)
-        assertEquals(0, dao.getByUser(1).first().size)
+        assertEquals(0, dao.getByUser(1).size)
     }
 
     @Test
@@ -118,6 +118,6 @@ class TodoItemDaoTest {
         val rows = dao.deleteById(id, 2)
 
         assertEquals(0, rows)
-        assertEquals(1, dao.getByUser(1).first().size)
+        assertEquals(1, dao.getByUser(1).size)
     }
 }
