@@ -10,6 +10,8 @@ import com.dgero.homly.auth.data.repository.TransactionRunner
 import com.dgero.homly.auth.data.session.DataStoreSessionRepository
 import com.dgero.homly.auth.domain.repository.SessionRepository
 import com.dgero.homly.auth.domain.repository.UserRepository
+import com.dgero.homly.calendar.data.repository.LocalCalendarEventRepository
+import com.dgero.homly.calendar.domain.repository.CalendarEventRepository
 import com.dgero.homly.core.data.HomlyDatabase
 import com.dgero.homly.shopping.data.repository.LocalShoppingRepository
 import com.dgero.homly.shopping.domain.repository.ShoppingRepository
@@ -23,7 +25,9 @@ class HomlyApplication : Application() {
 class AppContainer(context: Context) {
     val db: HomlyDatabase = Room.databaseBuilder(
         context, HomlyDatabase::class.java, "homly.db"
-    ).fallbackToDestructiveMigration(dropAllTables = true).build()
+    ).addMigrations(HomlyDatabase.MIGRATION_3_4)
+        .fallbackToDestructiveMigration(dropAllTables = true)
+        .build()
 
     val sessionRepository: SessionRepository = DataStoreSessionRepository(context)
 
@@ -45,5 +49,9 @@ class AppContainer(context: Context) {
     val todoRepository: TodoRepository = LocalTodoRepository(
         dao = db.todoItemDao(),
         runTransaction = transactionRunner,
+    )
+
+    val calendarEventRepository: CalendarEventRepository = LocalCalendarEventRepository(
+        dao = db.calendarEventDao(),
     )
 }
