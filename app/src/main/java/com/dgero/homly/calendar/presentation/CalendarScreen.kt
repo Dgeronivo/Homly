@@ -70,21 +70,21 @@ private const val GRID_WEEKS = 6
 /**
  * Month grid + selected day's event list (SAD Flow 1).
  *
- * The FAB ("+") checks the per-user event limit before navigating: [onAddEvent] fires when under
- * the limit, otherwise a Snackbar reports the limit reached (SAD Flow 4, AC-07b). [onEventClick]
- * opens an existing event in edit mode.
+ * The FAB ("+") checks the per-user event limit before navigating: [onAddEvent] fires (with the
+ * currently selected day, AC-13) when under the limit, otherwise a Snackbar reports the limit
+ * reached (SAD Flow 4, AC-07b). [onEventClick] opens an existing event in edit mode.
  */
 @Composable
 fun CalendarScreen(
     viewModel: CalendarViewModel,
-    onAddEvent: () -> Unit = {},
+    onAddEvent: (LocalDate) -> Unit = {},
     onEventClick: (Long) -> Unit = {},
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(Unit) {
-        viewModel.navigateToAddEvent.collect { onAddEvent() }
+        viewModel.navigateToAddEvent.collect { onAddEvent(uiState.selectedDate) }
     }
     LaunchedEffect(Unit) {
         viewModel.eventLimitReached.collect {

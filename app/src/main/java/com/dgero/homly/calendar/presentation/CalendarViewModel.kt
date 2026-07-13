@@ -61,11 +61,19 @@ class CalendarViewModel(
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), CalendarUiState())
 
-    /** Re-fetches the given month's events from the repository (SAD Flow 1). */
+    /**
+     * Re-fetches the given month's events from the repository (SAD Flow 1). Keeps the same
+     * day-of-month selected (clamped to the new month's length) so the FAB's add-event
+     * pre-filled date (AC-13) always stays within the visible month.
+     */
     fun onMonthChanged(yearMonth: YearMonth) {
         _currentYearMonth.value = yearMonth
+        _selectedDate.value = clampToMonth(_selectedDate.value, yearMonth)
         viewModelScope.launch { loadMonth(yearMonth) }
     }
+
+    private fun clampToMonth(date: LocalDate, yearMonth: YearMonth): LocalDate =
+        yearMonth.atDay(minOf(date.dayOfMonth, yearMonth.lengthOfMonth()))
 
     /**
      * Re-fetches the currently displayed month. Called when [CalendarScreen] resumes (e.g.

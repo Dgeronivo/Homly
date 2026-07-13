@@ -148,6 +148,44 @@ class CalendarViewModelTest {
     }
 
     @Test
+    fun `onMonthChanged_selectedDayFitsNewMonth_keepsSameDayOfMonth`() = runTest {
+        val repo = FakeCalendarEventRepository()
+        val session = FakeSessionRepository()
+
+        val vm = makeViewModel(repo, session)
+        backgroundScope.launch { vm.uiState.collect {} }
+        session.setSession(1L)
+        advanceUntilIdle()
+
+        vm.onDateSelected(yearMonth.atDay(15))
+        advanceUntilIdle()
+
+        vm.onMonthChanged(YearMonth.of(2026, 8))
+        advanceUntilIdle()
+
+        assertEquals(LocalDate.of(2026, 8, 15), vm.uiState.value.selectedDate)
+    }
+
+    @Test
+    fun `onMonthChanged_selectedDayBeyondNewMonthLength_clampsToLastDayOfMonth`() = runTest {
+        val repo = FakeCalendarEventRepository()
+        val session = FakeSessionRepository()
+
+        val vm = makeViewModel(repo, session)
+        backgroundScope.launch { vm.uiState.collect {} }
+        session.setSession(1L)
+        advanceUntilIdle()
+
+        vm.onDateSelected(LocalDate.of(2026, 1, 31))
+        advanceUntilIdle()
+
+        vm.onMonthChanged(YearMonth.of(2026, 2))
+        advanceUntilIdle()
+
+        assertEquals(LocalDate.of(2026, 2, 28), vm.uiState.value.selectedDate)
+    }
+
+    @Test
     fun `onDeleteEvent_lastEventOnDay_removesFromSelectedDayEventsAndClearsDayDot`() = runTest {
         val repo = FakeCalendarEventRepository()
         val session = FakeSessionRepository()

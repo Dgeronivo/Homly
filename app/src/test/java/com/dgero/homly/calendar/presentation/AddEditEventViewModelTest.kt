@@ -48,9 +48,10 @@ class AddEditEventViewModelTest {
         Dispatchers.resetMain()
     }
 
-    private fun makeViewModel(eventId: Long? = null): AddEditEventViewModel =
+    private fun makeViewModel(eventId: Long? = null, initialDate: LocalDate = day): AddEditEventViewModel =
         AddEditEventViewModel(
             eventId = eventId,
+            initialDate = initialDate,
             createEvent = CreateEventUseCase(repo),
             updateEvent = UpdateEventUseCase(repo),
             getEventById = GetEventByIdUseCase(repo),
@@ -103,6 +104,32 @@ class AddEditEventViewModelTest {
         assertTrue(saved.isAllDay)
         assertNull(saved.startTime)
         assertNull(saved.endTime)
+    }
+
+    @Test
+    fun `init_createModeWithInitialDate_seedsDateField`() = runTest {
+        val initialDate = LocalDate.of(2026, 8, 3)
+        val vm = makeViewModel(eventId = null, initialDate = initialDate)
+        primeSession(vm)
+
+        assertEquals(initialDate, vm.uiState.value.date)
+    }
+
+    @Test
+    fun `onSave_createModeWithoutChangingDate_persistsInitialDate`() = runTest {
+        val initialDate = LocalDate.of(2026, 8, 3)
+        val vm = makeViewModel(eventId = null, initialDate = initialDate)
+        primeSession(vm)
+
+        vm.onTitleChange("Trip")
+        vm.onAllDayToggle(true)
+
+        vm.onSave()
+        advanceUntilIdle()
+
+        assertTrue(vm.uiState.value.saveCompleted)
+        val saved = repo.getEventsForMonth(userId, YearMonth.from(initialDate)).single()
+        assertEquals(initialDate, saved.date)
     }
 
     @Test

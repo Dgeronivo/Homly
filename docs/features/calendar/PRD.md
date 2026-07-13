@@ -2,7 +2,7 @@
 status: Draft
 owner: "Alex"
 reviewers: ["Tech Lead", "Security Lead"]
-updated_at: "2026-06-28"
+updated_at: "2026-07-14"
 feature_size: M
 stage: "03"
 ticket: ""
@@ -164,6 +164,12 @@ resolved_questions:
 **Given** a user is not logged in
 **When** the user attempts to open the calendar screen
 **Then** the system redirects the user to the login screen and no event data is shown
+
+### AC-13 (US-02, US-03) — happy: add-event date defaults to the selected calendar day
+
+**Given** a user is viewing the calendar with a specific day selected (either by default or because the user tapped a date in the grid)
+**When** the user taps the "+" button to create a new event
+**Then** the add-event form opens with the date field pre-filled to that selected day, which the user can still change before saving
 
 ## 6. Non-functional requirements
 

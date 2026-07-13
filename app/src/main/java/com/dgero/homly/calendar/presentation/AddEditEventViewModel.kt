@@ -24,18 +24,23 @@ import kotlinx.coroutines.launch
  * Drives the add/edit event form (SAD Flow 2, Flow 3).
  *
  * [eventId] is `null` when creating a new event, or the id of an existing event to pre-fill and
- * update in place (AC-05). [userId] is read once from [sessionRepository] on init, mirroring
- * [com.dgero.homly.todolist.presentation.TodoListViewModel]'s pattern.
+ * update in place (AC-05). [initialDate] seeds the date field when creating a new event (AC-13 —
+ * the day currently selected on the calendar); it is ignored in edit mode since [prefill]
+ * overwrites the date from the loaded event. [userId] is read once from [sessionRepository] on
+ * init, mirroring [com.dgero.homly.todolist.presentation.TodoListViewModel]'s pattern.
  */
 class AddEditEventViewModel(
     private val eventId: Long?,
+    initialDate: LocalDate = LocalDate.now(),
     private val createEvent: CreateEventUseCase,
     private val updateEvent: UpdateEventUseCase,
     private val getEventById: GetEventByIdUseCase,
     private val sessionRepository: SessionRepository,
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(AddEditEventUiState(isEditMode = eventId != null))
+    private val _uiState = MutableStateFlow(
+        AddEditEventUiState(date = initialDate, isEditMode = eventId != null),
+    )
     val uiState: StateFlow<AddEditEventUiState> = _uiState.asStateFlow()
 
     private var userId: Long? = null
@@ -140,6 +145,7 @@ class AddEditEventViewModel(
 
     class Factory(
         private val eventId: Long?,
+        private val initialDate: LocalDate = LocalDate.now(),
         private val createEvent: CreateEventUseCase,
         private val updateEvent: UpdateEventUseCase,
         private val getEventById: GetEventByIdUseCase,
@@ -147,6 +153,6 @@ class AddEditEventViewModel(
     ) : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>): T =
-            AddEditEventViewModel(eventId, createEvent, updateEvent, getEventById, sessionRepository) as T
+            AddEditEventViewModel(eventId, initialDate, createEvent, updateEvent, getEventById, sessionRepository) as T
     }
 }

@@ -48,6 +48,7 @@ import com.dgero.homly.todolist.domain.validation.TodoTitleValidator
 import com.dgero.homly.todolist.presentation.TodoListScreen
 import com.dgero.homly.todolist.presentation.TodoListViewModel
 import com.dgero.homly.ui.theme.HomlyTheme
+import java.time.LocalDate
 import kotlinx.coroutines.flow.first
 
 class MainActivity : ComponentActivity() {
@@ -155,14 +156,21 @@ private fun AuthGate(container: AppContainer) {
                     )
                     CalendarScreen(
                         viewModel = vm,
-                        onAddEvent = { navController.navigate("calendar/add") },
+                        onAddEvent = { date -> navController.navigate("calendar/add/${date.toEpochDay()}") },
                         onEventClick = { id -> navController.navigate("calendar/edit/$id") },
                     )
                 }
-                composable("calendar/add") {
+                composable(
+                    "calendar/add/{date}",
+                    arguments = listOf(navArgument("date") { type = NavType.LongType }),
+                ) { backStackEntry ->
+                    val initialDate = backStackEntry.arguments?.getLong("date")
+                        ?.let(LocalDate::ofEpochDay)
+                        ?: LocalDate.now()
                     val vm: AddEditEventViewModel = viewModel(
                         factory = AddEditEventViewModel.Factory(
                             eventId = null,
+                            initialDate = initialDate,
                             createEvent = CreateEventUseCase(container.calendarEventRepository),
                             updateEvent = UpdateEventUseCase(container.calendarEventRepository),
                             getEventById = GetEventByIdUseCase(container.calendarEventRepository),
