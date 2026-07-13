@@ -2,51 +2,51 @@
 status: Accepted
 owner: "Alex"
 reviewers: ["Tech Lead"]
-updated_at: "2026-06-29"
+updated_at: "2026-07-14"
 feature_size: M
 stage: "04-05"
 ticket: ""
 ---
 
-# 0001 — Use proper Room Migration for calendar_events schema change
+# 0001 — Rely on fallbackToDestructiveMigration for calendar_events schema change
 
-- **Status:** Accepted
-- **Date:** 2026-06-29
+- **Status:** Accepted (revised 2026-07-14 — reverses the original 2026-06-29 decision)
+- **Date:** 2026-06-29 (original) / 2026-07-14 (revision)
 - **Deciders:** Alex (Architect)
 
 ## Context
 
-Додавання таблиці `calendar_events` вимагає зміни `HomlyDatabase.version` з 3 до 4. Наразі в базі активний `fallbackToDestructiveMigration`, який знищує всі дані при незапланованій зміні схеми. Бізнес-рішення: для цього проекту потрібна явна Migration.
+Додавання таблиці `calendar_events` вимагає зміни `HomlyDatabase.version` з 3 до 4. Початково (2026-06-29) було прийнято рішення написати явну `Migration(3, 4)`, щоб не втратити існуючі todo/shopping-дані при зміні схеми під час розробки. Проект залишається experimental prototype (PRD §6 — NFR deferred, немає production-даних, немає production SLA): вартість підтримки явної міграції та окремого instrumented-тесту (`CalendarMigrationTest`) перевищує цінність для одноразового прототипу, де локальна БД на пристрої розробника скидається без жодних наслідків.
 
 ## Decision drivers
 
-- Збереження даних користувача (todo, shopping, session) при оновленні застосунку
-- `HomlyDatabase` спільна для всіх модулів — будь-яка деструктивна операція зачіпає всі фічі
-- Простота: Migration(3→4) — лише `CREATE TABLE calendar_events (...)`, не потребує перезапису даних
+- Прототип не має production-користувачів і production-даних — втрата локальної БД під час розробки не критична
+- Явна Migration додавала ~15 LOC у `HomlyDatabase` + окремий instrumented-тест (`CalendarMigrationTest`), які для прототипу недоцільно підтримувати
+- `fallbackToDestructiveMigration(dropAllTables = true)` вже присутній у `AppContainer` як safety net — простіше й дешевше покладатись лише на нього
 
 ## Considered options
 
-1. **Proper Migration(3→4)** — явна SQL-міграція `CREATE TABLE calendar_events (...)` в `HomlyDatabase`.
-2. **Rely on fallbackToDestructiveMigration** — не писати міграцію; Room видалить і пересоздасть БД при зміні версії.
+1. **Proper Migration(3→4)** — явна SQL-міграція `CREATE TABLE calendar_events (...)` в `HomlyDatabase` (початкове рішення, 2026-06-29).
+2. **Rely on fallbackToDestructiveMigration** — не писати міграцію; Room видаляє і пересоздає БД при зміні версії.
 
 ## Decision outcome
 
-**Chosen:** Option 1 — Proper Migration(3→4).
+**Chosen:** Option 2 — Rely on fallbackToDestructiveMigration (реверс початкового рішення від 2026-06-29).
 
-Деструктивна міграція означає втрату todo-items і shopping-items кожного разу, коли змінюється схема під час розробки. Оскільки Migration(3→4) є простою (`CREATE TABLE` без data backfill), зусилля мінімальні, а збереження існуючих даних критично навіть для прототипу.
+Для experimental prototype без production-даних вартість підтримки явної Migration (код + окремий тест) не виправдана. `fallbackToDestructiveMigration(dropAllTables = true)` вже налаштований у `AppContainer` і покриває version bump 3→4: якщо схема застаріла, Room просто перестворює БД. Явну `Migration(3, 4)` та `CalendarMigrationTest` видалено з кодової бази.
 
 ## Consequences
 
 **Positive**
-- Дані todo/shopping/session зберігаються при оновленні
-- Встановлюємо precedent явних міграцій для наступних фіч (family, shopping v2)
+- Менше коду й тестів для підтримки в прототипі
+- Одне джерело правди для схемних змін (`fallbackToDestructiveMigration`), без розбіжностей між явними міграціями окремих фіч
 
 **Negative**
-- ~10-20 LOC додаткового коду у `HomlyDatabase`
-- Кожна наступна зміна схеми потребує явної migration
+- Зміна схеми (включно з цим 3→4 бампом) видаляє всі локальні дані (`users`, `todo_items`, `shopping_items`, `calendar_events`) при першому запуску після оновлення — прийнятно лише поки немає production-користувачів
+- Якщо проект вийде за межі прототипу, це рішення потрібно переглянути до першого production-релізу (див. sad.md §11 risks)
 
 **Neutral**
-- `fallbackToDestructiveMigration` залишається як fallback на edge-cases (corrupted DB) — не видаляємо
+- Схема-експорти (`app/schemas/.../3.json`, `4.json`) залишаються — Room генерує їх незалежно від наявності явної міграції
 
 ## Links
 

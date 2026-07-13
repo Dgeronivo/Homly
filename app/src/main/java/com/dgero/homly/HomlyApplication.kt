@@ -25,8 +25,7 @@ class HomlyApplication : Application() {
 class AppContainer(context: Context) {
     val db: HomlyDatabase = Room.databaseBuilder(
         context, HomlyDatabase::class.java, "homly.db"
-    ).addMigrations(HomlyDatabase.MIGRATION_3_4)
-        .fallbackToDestructiveMigration(dropAllTables = true)
+    ).fallbackToDestructiveMigration(dropAllTables = true)
         .build()
 
     val sessionRepository: SessionRepository = DataStoreSessionRepository(context)

@@ -92,7 +92,7 @@ C4Context
 
 **SC-1: Follow existing MVVM feature module pattern** — нова папка `calendar/` зі стандартним layout `presentation/domain/data`, manual wiring через `AppContainer`. Відхилення не потрібне: idea-brief §8 фіксує «events структурно ідентичні todo+shopping плюс datetime-поля». *(inline — конвенція ARCHITECTURE.md)*
 
-**SC-2: Розширити `HomlyDatabase` з явною Migration(3→4)** — таблиця `calendar_events` додається до єдиної Room-бази; version bump 3→4 через `Migration(3, 4)` з `CREATE TABLE`. Альтернатива `fallbackToDestructiveMigration` відхилена — втрата todo/shopping-даних неприйнятна навіть для прототипу. *(→ ADR-0001)*
+**SC-2: Розширити `HomlyDatabase` version bump 3→4, покладаючись на `fallbackToDestructiveMigration`** — таблиця `calendar_events` додається до єдиної Room-бази через простий version bump; явна `Migration(3, 4)` не пишеться. Для experimental prototype без production-даних вартість підтримки явної міграції не виправдана. *(→ ADR-0001, revised 2026-07-14)*
 
 **SC-3: Enforce per-user filtering at DAO level** — кожен DAO-метод на читання містить `WHERE userId = :userId`. Defense in depth: security-invariant не залежить від коректності use-case. Узгоджено з паттерном `TodoItemEntity`/`ShoppingItemEntity`. *(→ ADR-0002)*
 
@@ -283,7 +283,7 @@ sequenceDiagram
 
 | # | Title | Status | Section |
 |---|---|---|---|
-| 0001 | Use proper Room Migration for calendar_events schema change | Accepted | §4 |
+| 0001 | Rely on fallbackToDestructiveMigration for calendar_events schema change | Accepted (revised 2026-07-14) | §4 |
 | 0002 | Enforce per-user event filtering at DAO level | Accepted | §4 |
 | 0003 | Raise minSdk to 29 for native java.time support | Accepted | §2, §5 |
 
@@ -313,7 +313,7 @@ sequenceDiagram
 
 | Risk / debt | Severity | Mitigation | Owner |
 |---|---|---|---|
-| `fallbackToDestructiveMigration` залишається активним — при помилці у Migration(3→4) Room знищить всі дані | Medium | Покрити Migration(3→4) unit-тестом (`MigrationTest`); перевіряти schema перед релізом | Alex |
+| `fallbackToDestructiveMigration` — єдиний шлях для зміни схеми (включно з version bump 3→4 для calendar_events); будь-яка наступна зміна схеми видаляє всі локальні дані | Medium | Прийнятно для experimental prototype без production-даних (ADR-0001, revised 2026-07-14); переглянути перед виходом за межі прототипу | Alex |
 | Спільний сімейний доступ до подій (family sharing) відсутній у v1 — per-user only | Low | Accepted by design (PRD §3); буде у family-module фазі | Alex |
 | minSdk 29 відсікає Android 7–9 (API 24–28) | Low | Accepted for prototype (ADR-0003); переглянути при виході за межі prototype | Alex |
 | Рядки UI захардкоджені українською — без string resources | Low | Acceptable for prototype; extraction до `strings.xml` перед production | Alex |
@@ -337,4 +337,3 @@ sequenceDiagram
 | CalendarError | `sealed class` у `domain/error/`: EmptyTitle / TitleTooLong / EndNotAfterStart / EventLimitReached |
 | CalendarLimits | `object` у `domain/` з `const val MAX_EVENTS = 100` (PRD §8, resolved 2026-06-28) |
 | DateTimeConverters | Room `@TypeConverter` клас: `LocalDate` ↔ `Long` (epochDay), `LocalTime` ↔ `Int` (secondOfDay) |
-| Migration(3→4) | Явна Room DB міграція — `CREATE TABLE calendar_events (...)` при version bump 3→4 (ADR-0001) |
