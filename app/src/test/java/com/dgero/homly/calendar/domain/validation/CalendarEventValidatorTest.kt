@@ -90,6 +90,45 @@ class CalendarEventValidatorTest {
     }
 
     @Test
+    fun validate_timedEventMissingStartTime_returnsEndNotAfterStart() {
+        assertEquals(
+            CalendarError.EndNotAfterStart,
+            CalendarEventValidator.validate(
+                title = "Meeting",
+                isAllDay = false,
+                startTime = null,
+                endTime = LocalTime.of(10, 0),
+            ),
+        )
+    }
+
+    @Test
+    fun validate_timedEventMissingEndTime_returnsEndNotAfterStart() {
+        assertEquals(
+            CalendarError.EndNotAfterStart,
+            CalendarEventValidator.validate(
+                title = "Meeting",
+                isAllDay = false,
+                startTime = LocalTime.of(9, 0),
+                endTime = null,
+            ),
+        )
+    }
+
+    @Test
+    fun validate_timedEventMissingBothTimes_returnsEndNotAfterStart() {
+        assertEquals(
+            CalendarError.EndNotAfterStart,
+            CalendarEventValidator.validate(
+                title = "Meeting",
+                isAllDay = false,
+                startTime = null,
+                endTime = null,
+            ),
+        )
+    }
+
+    @Test
     fun validate_allDayEventIgnoresTimes_returnsNull() {
         assertNull(
             CalendarEventValidator.validate(

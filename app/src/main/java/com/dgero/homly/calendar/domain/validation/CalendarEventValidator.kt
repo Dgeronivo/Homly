@@ -28,8 +28,9 @@ object CalendarEventValidator {
         }
     }
 
+    /** A timed event must have both times set, with [endTime] strictly after [startTime]. */
     private fun isEndAfterStart(startTime: LocalTime?, endTime: LocalTime?): Boolean {
-        if (startTime == null || endTime == null) return true
+        if (startTime == null || endTime == null) return false
         return endTime.isAfter(startTime)
     }
 }

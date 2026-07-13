@@ -95,6 +95,16 @@ class CreateEventUseCaseTest {
     }
 
     @Test
+    fun `invoke_timedEventMissingTimes_failsWithoutWritingToRepository`() = runTest {
+        val draft = CalendarEvent(0L, 0L, "Meeting", day, false, null, null)
+
+        val result = useCase(userId, draft)
+
+        assertEquals(CalendarError.EndNotAfterStart, result.exceptionOrNull())
+        assertEquals(0, repo.getEventCount(userId))
+    }
+
+    @Test
     fun `invoke_eventLimitReached_failsWithoutWritingToRepository`() = runTest {
         seedEvents(count = CalendarLimits.MAX_EVENTS)
         val draft = CalendarEvent(0L, 0L, "One too many", day, true, null, null)
