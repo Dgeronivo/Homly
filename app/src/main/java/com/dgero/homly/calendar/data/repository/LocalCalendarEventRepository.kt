@@ -32,8 +32,13 @@ class LocalCalendarEventRepository(
     }
 
     override suspend fun update(event: CalendarEvent): Result<Unit> = try {
-        dao.update(event.toEntity())
-        Result.success(Unit)
+        val existing = dao.getById(event.id)
+        if (existing == null || existing.userId != event.userId) {
+            Result.failure(NoSuchElementException("Calendar event ${event.id} not found for user ${event.userId}"))
+        } else {
+            dao.update(event.toEntity())
+            Result.success(Unit)
+        }
     } catch (e: Exception) {
         Result.failure(e)
     }

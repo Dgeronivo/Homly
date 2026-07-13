@@ -121,6 +121,28 @@ class LocalCalendarEventRepositoryTest {
     }
 
     @Test
+    fun `update_withWrongUser_failsAndKeepsOriginal`() = runTest {
+        val created = repository.create(
+            CalendarEvent(0, 1, "Old title", LocalDate.of(2026, 7, 10), true, null, null)
+        ).getOrThrow()
+
+        val result = repository.update(created.copy(userId = 2, title = "Hijacked"))
+
+        assertTrue(result.isFailure)
+        val stored = repository.getEventsForMonth(1, YearMonth.of(2026, 7)).single()
+        assertEquals("Old title", stored.title)
+    }
+
+    @Test
+    fun `update_nonExistentId_fails`() = runTest {
+        val result = repository.update(
+            CalendarEvent(999, 1, "Ghost", LocalDate.of(2026, 7, 10), true, null, null)
+        )
+
+        assertTrue(result.isFailure)
+    }
+
+    @Test
     fun `delete_withCorrectUser_removesEvent`() = runTest {
         val created = repository.create(
             CalendarEvent(0, 1, "Task", LocalDate.of(2026, 7, 10), true, null, null)

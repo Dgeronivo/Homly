@@ -33,9 +33,13 @@ class FakeCalendarEventRepository : CalendarEventRepository {
 
     override suspend fun update(event: CalendarEvent): Result<Unit> {
         updateCallCount++
-        if (!events.containsKey(event.id)) return Result.failure(NoSuchElementException("No event ${event.id}"))
-        events[event.id] = event
-        return Result.success(Unit)
+        val existing = events[event.id]
+        return if (existing == null || existing.userId != event.userId) {
+            Result.failure(NoSuchElementException("Calendar event ${event.id} not found for user ${event.userId}"))
+        } else {
+            events[event.id] = event
+            Result.success(Unit)
+        }
     }
 
     override suspend fun delete(id: Long, userId: Long): Result<Unit> {

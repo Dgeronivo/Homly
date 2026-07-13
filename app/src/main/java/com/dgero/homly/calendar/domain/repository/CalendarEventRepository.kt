@@ -16,6 +16,7 @@ interface CalendarEventRepository {
     /** [event].id is ignored on input; the returned event carries the generated id. */
     suspend fun create(event: CalendarEvent): Result<CalendarEvent>
 
+    /** Fails if no event with [CalendarEvent.id] exists, or it is owned by a different user. */
     suspend fun update(event: CalendarEvent): Result<Unit>
 
     suspend fun delete(id: Long, userId: Long): Result<Unit>

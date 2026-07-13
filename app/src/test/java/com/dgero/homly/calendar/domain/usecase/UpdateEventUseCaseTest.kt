@@ -95,6 +95,17 @@ class UpdateEventUseCaseTest {
     }
 
     @Test
+    fun `invoke_draftOwnedByDifferentUser_failsAndDoesNotOverwriteOthersEvent`() = runTest {
+        val original = seedOriginal()
+
+        val result = useCase(original.copy(userId = 2L, title = "Hijacked"))
+
+        assertTrue(result.isFailure)
+        val stored = repo.getEventsForMonth(userId, java.time.YearMonth.from(day)).single()
+        assertEquals("Doctor", stored.title)
+    }
+
+    @Test
     fun `invoke_atOrOverEventLimit_stillSucceeds_noLimitCheckPerformed`() = runTest {
         seedEvents(count = CalendarLimits.MAX_EVENTS)
         val original = seedOriginal(id = (CalendarLimits.MAX_EVENTS + 1).toLong())
