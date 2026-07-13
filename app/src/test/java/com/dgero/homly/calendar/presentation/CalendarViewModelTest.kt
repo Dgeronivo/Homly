@@ -214,6 +214,34 @@ class CalendarViewModelTest {
     }
 
     @Test
+    fun `refresh_afterEventAddedElsewhere_picksUpNewEventInCurrentMonth`() = runTest {
+        val repo = FakeCalendarEventRepository()
+        val session = FakeSessionRepository()
+
+        val vm = makeViewModel(repo, session)
+        backgroundScope.launch { vm.uiState.collect {} }
+        session.setSession(1L)
+        advanceUntilIdle()
+
+        assertTrue(vm.uiState.value.daysWithEvents.isEmpty())
+
+        // Simulates AddEditEventViewModel creating an event via the same repository while
+        // CalendarViewModel (a separate, already-loaded instance) is still on screen.
+        val day = yearMonth.atDay(3)
+        repo.seedEvent(
+            CalendarEvent(
+                id = 1, userId = 1, title = "New event", date = day,
+                isAllDay = true, startTime = null, endTime = null,
+            ),
+        )
+
+        vm.refresh()
+        advanceUntilIdle()
+
+        assertTrue(vm.uiState.value.daysWithEvents.contains(day))
+    }
+
+    @Test
     fun `onAddEventClick_underLimit_emitsNavigateToAddEvent`() = runTest {
         val repo = FakeCalendarEventRepository()
         val session = FakeSessionRepository()

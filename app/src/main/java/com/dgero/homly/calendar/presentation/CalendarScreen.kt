@@ -33,11 +33,13 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -45,6 +47,9 @@ import androidx.compose.ui.platform.LocalLocale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.dgero.homly.calendar.domain.CalendarLimits
 import com.dgero.homly.calendar.domain.model.CalendarEvent
@@ -85,6 +90,19 @@ fun CalendarScreen(
         viewModel.eventLimitReached.collect {
             snackbarHostState.showSnackbar("Event limit reached (max ${CalendarLimits.MAX_EVENTS} events)")
         }
+    }
+
+    // Re-fetches the current month whenever this screen resumes — e.g. returning from
+    // AddEditEventScreen after a create/edit/delete — since CalendarViewModel survives that
+    // round-trip and would otherwise keep showing stale data (AC-05/AC-06).
+    val lifecycleOwner = LocalLifecycleOwner.current
+    val onResume by rememberUpdatedState(viewModel::refresh)
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) onResume()
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
     }
 
     CalendarContent(

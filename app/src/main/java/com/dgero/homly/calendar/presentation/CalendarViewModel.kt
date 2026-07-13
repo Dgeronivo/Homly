@@ -67,6 +67,16 @@ class CalendarViewModel(
         viewModelScope.launch { loadMonth(yearMonth) }
     }
 
+    /**
+     * Re-fetches the currently displayed month. Called when [CalendarScreen] resumes (e.g.
+     * returning from creating/editing an event in a separate nav destination — AC-05/AC-06),
+     * since this ViewModel instance survives that round-trip and would otherwise keep serving
+     * stale data.
+     */
+    fun refresh() {
+        viewModelScope.launch { loadMonth(_currentYearMonth.value) }
+    }
+
     /** Filters the already-loaded month's events down to [date] — no new repository call. */
     fun onDateSelected(date: LocalDate) {
         _selectedDate.value = date
