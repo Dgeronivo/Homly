@@ -48,9 +48,9 @@
 
 ## Definition of done
 
-- [ ] На екранах Login і Register є кнопка перемикання видимості пароля
-- [ ] Дефолтний стан — пароль прихований (без регресії існуючої поведінки)
-- [ ] Нових залежностей (material-icons-extended) не додано
-- [ ] `LoginViewModel`, `RegisterViewModel`, `LoginUiState`, `RegisterUiState` не змінені
-- [ ] `make rebuild` — зелений
-- [ ] Усі зміни сторі закомічені одним комітом
+- [x] На екранах Login і Register є кнопка перемикання видимості пароля
+- [x] Дефолтний стан — пароль прихований (без регресії існуючої поведінки)
+- [x] Нових залежностей (material-icons-extended) не додано
+- [x] `LoginViewModel`, `RegisterViewModel`, `LoginUiState`, `RegisterUiState` не змінені
+- [x] `make rebuild` — зелений
+- [x] Усі зміни сторі закомічені одним комітом
