@@ -11,6 +11,7 @@ import com.dgero.homly.shopping.domain.model.ShoppingItem
 import com.dgero.homly.shopping.domain.usecase.GetUnboughtShoppingItemCountUseCaseImpl
 import com.dgero.homly.todolist.domain.model.TodoItem
 import com.dgero.homly.todolist.domain.usecase.GetPendingTodoCountUseCaseImpl
+import com.dgero.homly.todolist.domain.usecase.GetTodoItemCountUseCaseImpl
 import com.dgero.homly.todolist.fake.FakeTodoRepository
 import java.time.LocalDate
 import kotlinx.coroutines.Dispatchers
@@ -69,6 +70,7 @@ class HomeViewModelTest {
             getTodayEventsCount = GetTodayEventsCountUseCaseImpl(GetEventsUseCase(calendarRepo)),
             getUnboughtShoppingItemCount = GetUnboughtShoppingItemCountUseCaseImpl(shoppingRepo),
             getPendingTodoCount = GetPendingTodoCountUseCaseImpl(todoRepo),
+            getTodoItemCount = GetTodoItemCountUseCaseImpl(todoRepo),
         )
     }
 
@@ -159,6 +161,32 @@ class HomeViewModelTest {
         advanceUntilIdle()
 
         assertEquals(1, vm.todoPendingCount.value)
+    }
+
+    @Test
+    fun `todoTotalCount_zeroWhenListIsEmpty`() = runTest {
+        val todoRepo = FakeTodoRepository()
+        val session = FakeSessionRepository()
+        val vm = makeViewModel(todoRepo = todoRepo, session = session)
+        backgroundScope.launch { vm.todoTotalCount.collect {} }
+        session.setSession(1L)
+        advanceUntilIdle()
+
+        assertEquals(0, vm.todoTotalCount.value)
+    }
+
+    @Test
+    fun `todoTotalCount_countsAllItemsRegardlessOfDoneState`() = runTest {
+        val todoRepo = FakeTodoRepository()
+        todoRepo.seedItem(1L, TodoItem(id = 1, title = "Pending", isDone = false, createdAt = 1L))
+        todoRepo.seedItem(1L, TodoItem(id = 2, title = "Done", isDone = true, createdAt = 2L))
+        val session = FakeSessionRepository()
+        val vm = makeViewModel(todoRepo = todoRepo, session = session)
+        backgroundScope.launch { vm.todoTotalCount.collect {} }
+        session.setSession(1L)
+        advanceUntilIdle()
+
+        assertEquals(2, vm.todoTotalCount.value)
     }
 
     @Test

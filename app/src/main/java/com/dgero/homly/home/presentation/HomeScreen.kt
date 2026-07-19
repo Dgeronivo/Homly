@@ -54,6 +54,7 @@ fun HomeScreen(
     val todayEventsCount by viewModel.todayEventsCount.collectAsStateWithLifecycle()
     val shoppingActiveCount by viewModel.shoppingActiveCount.collectAsStateWithLifecycle()
     val todoPendingCount by viewModel.todoPendingCount.collectAsStateWithLifecycle()
+    val todoTotalCount by viewModel.todoTotalCount.collectAsStateWithLifecycle()
 
     // Re-fetches the suspend-sourced summary counts whenever this screen resumes — e.g.
     // returning from Calendar/Shopping/Todo after changes — since HomeViewModel survives that
@@ -72,6 +73,7 @@ fun HomeScreen(
         todayEventsCount = todayEventsCount,
         shoppingActiveCount = shoppingActiveCount,
         todoPendingCount = todoPendingCount,
+        todoTotalCount = todoTotalCount,
         onOpenShoppingList = onOpenShoppingList,
         onOpenTodoList = onOpenTodoList,
         onOpenCalendar = onOpenCalendar,
@@ -85,6 +87,7 @@ private fun HomeContent(
     todayEventsCount: Int,
     shoppingActiveCount: Int,
     todoPendingCount: Int,
+    todoTotalCount: Int,
     onOpenShoppingList: () -> Unit,
     onOpenTodoList: () -> Unit,
     onOpenCalendar: () -> Unit,
@@ -131,7 +134,11 @@ private fun HomeContent(
                 GridFeatureCard(
                     icon = Icons.Default.CheckCircle,
                     title = "Todo list",
-                    summary = if (todoPendingCount > 0) "$todoPendingCount pending" else "All done",
+                    summary = when {
+                        todoPendingCount > 0 -> "$todoPendingCount pending"
+                        todoTotalCount > 0 -> "All done"
+                        else -> "Empty"
+                    },
                     onClick = onOpenTodoList,
                     modifier = Modifier.weight(1f),
                 )
@@ -226,6 +233,24 @@ private fun HomeContentPreview() {
             todayEventsCount = 2,
             shoppingActiveCount = 5,
             todoPendingCount = 3,
+            todoTotalCount = 5,
+            onOpenShoppingList = {},
+            onOpenTodoList = {},
+            onOpenCalendar = {},
+            onLogout = {},
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun HomeContentAllDonePreview() {
+    HomlyTheme {
+        HomeContent(
+            todayEventsCount = 0,
+            shoppingActiveCount = 0,
+            todoPendingCount = 0,
+            todoTotalCount = 4,
             onOpenShoppingList = {},
             onOpenTodoList = {},
             onOpenCalendar = {},
@@ -242,6 +267,7 @@ private fun HomeContentEmptyPreview() {
             todayEventsCount = 0,
             shoppingActiveCount = 0,
             todoPendingCount = 0,
+            todoTotalCount = 0,
             onOpenShoppingList = {},
             onOpenTodoList = {},
             onOpenCalendar = {},

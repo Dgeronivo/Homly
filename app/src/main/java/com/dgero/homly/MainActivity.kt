@@ -46,6 +46,7 @@ import com.dgero.homly.todolist.domain.usecase.DeleteCompletedTodoItemsUseCase
 import com.dgero.homly.todolist.domain.usecase.DeleteTodoItemUseCase
 import com.dgero.homly.todolist.domain.usecase.EditTodoItemUseCase
 import com.dgero.homly.todolist.domain.usecase.GetPendingTodoCountUseCaseImpl
+import com.dgero.homly.todolist.domain.usecase.GetTodoItemCountUseCaseImpl
 import com.dgero.homly.todolist.domain.usecase.GetTodoItemsUseCase
 import com.dgero.homly.todolist.domain.usecase.ToggleTodoItemUseCase
 import com.dgero.homly.todolist.domain.validation.TodoTitleValidator
@@ -108,6 +109,7 @@ private fun AuthGate(container: AppContainer) {
                                 container.shoppingRepository,
                             ),
                             getPendingTodoCount = GetPendingTodoCountUseCaseImpl(container.todoRepository),
+                            getTodoItemCount = GetTodoItemCountUseCaseImpl(container.todoRepository),
                         )
                     )
                     HomeScreen(

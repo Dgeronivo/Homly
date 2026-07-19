@@ -8,6 +8,7 @@ import com.dgero.homly.auth.domain.usecase.LogoutUseCase
 import com.dgero.homly.calendar.domain.usecase.port.GetTodayEventsCountUseCase
 import com.dgero.homly.shopping.domain.usecase.port.GetUnboughtShoppingItemCountUseCase
 import com.dgero.homly.todolist.domain.usecase.port.GetPendingTodoCountUseCase
+import com.dgero.homly.todolist.domain.usecase.port.GetTodoItemCountUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.filterNotNull
@@ -20,6 +21,7 @@ class HomeViewModel(
     private val getTodayEventsCount: GetTodayEventsCountUseCase,
     private val getUnboughtShoppingItemCount: GetUnboughtShoppingItemCountUseCase,
     private val getPendingTodoCount: GetPendingTodoCountUseCase,
+    private val getTodoItemCount: GetTodoItemCountUseCase,
 ) : ViewModel() {
 
     private var userId: Long? = null
@@ -29,6 +31,9 @@ class HomeViewModel(
 
     private val _todoPendingCount = MutableStateFlow(0)
     val todoPendingCount: StateFlow<Int> = _todoPendingCount
+
+    private val _todoTotalCount = MutableStateFlow(0)
+    val todoTotalCount: StateFlow<Int> = _todoTotalCount
 
     private val _shoppingActiveCount = MutableStateFlow(0)
     val shoppingActiveCount: StateFlow<Int> = _shoppingActiveCount
@@ -55,6 +60,7 @@ class HomeViewModel(
         _todayEventsCount.value = getTodayEventsCount(uid)
         _shoppingActiveCount.value = getUnboughtShoppingItemCount(uid)
         _todoPendingCount.value = getPendingTodoCount(uid)
+        _todoTotalCount.value = getTodoItemCount(uid)
     }
 
     fun onLogout(onDone: () -> Unit) {
@@ -70,6 +76,7 @@ class HomeViewModel(
         private val getTodayEventsCount: GetTodayEventsCountUseCase,
         private val getUnboughtShoppingItemCount: GetUnboughtShoppingItemCountUseCase,
         private val getPendingTodoCount: GetPendingTodoCountUseCase,
+        private val getTodoItemCount: GetTodoItemCountUseCase,
     ) : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>): T =
@@ -79,6 +86,7 @@ class HomeViewModel(
                 getTodayEventsCount = getTodayEventsCount,
                 getUnboughtShoppingItemCount = getUnboughtShoppingItemCount,
                 getPendingTodoCount = getPendingTodoCount,
+                getTodoItemCount = getTodoItemCount,
             ) as T
     }
 }
