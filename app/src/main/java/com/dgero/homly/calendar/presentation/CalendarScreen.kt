@@ -16,6 +16,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -41,9 +43,14 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalLocale
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -61,11 +68,13 @@ import java.time.Month
 import java.time.YearMonth
 import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle
+import kotlinx.coroutines.flow.drop
 
 private val MONTH_HEADER_FORMATTER = DateTimeFormatter.ofPattern("MMMM yyyy")
 private val TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm")
 private val WEEKDAY_LABELS = listOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
 private const val GRID_WEEKS = 6
+internal const val MONTH_PAGER_TEST_TAG = "monthPager"
 
 /**
  * Month grid + selected day's event list (SAD Flow 1).
@@ -118,7 +127,7 @@ fun CalendarScreen(
 }
 
 @Composable
-private fun CalendarContent(
+internal fun CalendarContent(
     uiState: CalendarUiState,
     snackbarHostState: SnackbarHostState,
     onDateSelected: (LocalDate) -> Unit,
@@ -129,6 +138,30 @@ private fun CalendarContent(
     onFabClick: () -> Unit,
 ) {
     var showMonthYearPicker by remember { mutableStateOf(false) }
+
+    // Fixed once per screen instance: the reference point the pager's huge page range is
+    // measured from (PAGER_ANCHOR_PAGE == this month). Must not track uiState.currentYearMonth,
+    // or every swipe would shift the anchor and break the page<->month mapping.
+    val anchorYearMonth = remember { uiState.currentYearMonth }
+    val pagerState = rememberPagerState(
+        initialPage = yearMonthToPage(uiState.currentYearMonth, anchorYearMonth),
+        pageCount = { PAGER_PAGE_COUNT },
+    )
+
+    // Swipe settles on a new page -> tell the ViewModel. animateScrollToPage below also settles
+    // on its target page, so this fires for programmatic jumps too; onMonthChanged is idempotent
+    // for an unchanged month, so that's harmless. drop(1) skips the initial emission of the
+    // starting page, which would otherwise re-trigger a load of the already-current month.
+    LaunchedEffect(pagerState) {
+        snapshotFlow { pagerState.settledPage }.drop(1).collect { page ->
+            onMonthChanged(pageToYearMonth(page, anchorYearMonth))
+        }
+    }
+    // "Сьогодні" / month-year picker changed the month -> scroll the pager to match.
+    LaunchedEffect(uiState.currentYearMonth) {
+        val targetPage = yearMonthToPage(uiState.currentYearMonth, anchorYearMonth)
+        if (pagerState.currentPage != targetPage) pagerState.animateScrollToPage(targetPage)
+    }
 
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
@@ -150,12 +183,22 @@ private fun CalendarContent(
                 onTodayClick = onTodayClick,
             )
             Spacer(Modifier.height(8.dp))
-            MonthGrid(
-                yearMonth = uiState.currentYearMonth,
-                selectedDate = uiState.selectedDate,
-                daysWithEvents = uiState.daysWithEvents,
-                onDateSelected = onDateSelected,
-            )
+            HorizontalPager(
+                state = pagerState,
+                modifier = Modifier.testTag(MONTH_PAGER_TEST_TAG),
+            ) { page ->
+                val pageYearMonth = pageToYearMonth(page, anchorYearMonth)
+                MonthGrid(
+                    yearMonth = pageYearMonth,
+                    selectedDate = uiState.selectedDate,
+                    daysWithEvents = if (pageYearMonth == uiState.currentYearMonth) {
+                        uiState.daysWithEvents
+                    } else {
+                        emptySet()
+                    },
+                    onDateSelected = onDateSelected,
+                )
+            }
             Spacer(Modifier.height(16.dp))
             HorizontalDivider()
             Spacer(Modifier.height(8.dp))
@@ -192,13 +235,39 @@ private fun MonthHeader(yearMonth: YearMonth, onPickerClick: () -> Unit, onToday
             style = MaterialTheme.typography.headlineSmall,
         )
         Row(verticalAlignment = Alignment.CenterVertically) {
-            TextButton(onClick = onTodayClick) {
-                Text("Сьогодні")
-            }
+            TodayButton(onClick = onTodayClick)
             IconButton(onClick = onPickerClick) {
                 Icon(Icons.Default.DateRange, contentDescription = "Pick month and year")
             }
         }
+    }
+}
+
+/** Circular "jump to today" shortcut showing today's day-of-month number, like a mini date badge. */
+@Composable
+private fun TodayButton(onClick: () -> Unit) {
+    Box(
+        modifier = Modifier
+            .size(32.dp)
+            .clip(CircleShape)
+            .background(MaterialTheme.colorScheme.primary)
+            .clickable(onClick = onClick)
+            .semantics { contentDescription = "Сьогодні" },
+        contentAlignment = Alignment.Center,
+    ) {
+        Text(
+            text = LocalDate.now().dayOfMonth.toString(),
+            style = MaterialTheme.typography.labelLarge,
+            color = MaterialTheme.colorScheme.onPrimary,
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun TodayButtonPreview() {
+    HomlyTheme {
+        TodayButton(onClick = {})
     }
 }
 
