@@ -39,7 +39,6 @@ fun HomeScreen(
     onOpenCalendar: () -> Unit,
     onLogout: () -> Unit,
 ) {
-    val login by viewModel.login.collectAsStateWithLifecycle()
     val todayEventsCount by viewModel.todayEventsCount.collectAsStateWithLifecycle()
     val shoppingActiveCount by viewModel.shoppingActiveCount.collectAsStateWithLifecycle()
     val todoPendingCount by viewModel.todoPendingCount.collectAsStateWithLifecycle()
@@ -58,7 +57,6 @@ fun HomeScreen(
     }
 
     HomeContent(
-        login = login,
         todayEventsCount = todayEventsCount,
         shoppingActiveCount = shoppingActiveCount,
         todoPendingCount = todoPendingCount,
@@ -71,7 +69,6 @@ fun HomeScreen(
 
 @Composable
 private fun HomeContent(
-    login: String,
     todayEventsCount: Int,
     shoppingActiveCount: Int,
     todoPendingCount: Int,
@@ -87,8 +84,6 @@ private fun HomeContent(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {
-        Text(text = "Hello $login", style = MaterialTheme.typography.headlineMedium)
-        Spacer(Modifier.height(24.dp))
         FeatureCard(
             title = "Shopping list",
             summary = if (shoppingActiveCount > 0) "$shoppingActiveCount items left to buy" else "Shopping list is empty",
@@ -154,7 +149,6 @@ private fun FeatureCard(
 private fun HomeContentPreview() {
     HomlyTheme {
         HomeContent(
-            login = "alex",
             todayEventsCount = 2,
             shoppingActiveCount = 5,
             todoPendingCount = 3,
@@ -171,7 +165,6 @@ private fun HomeContentPreview() {
 private fun HomeContentEmptyPreview() {
     HomlyTheme {
         HomeContent(
-            login = "alex",
             todayEventsCount = 0,
             shoppingActiveCount = 0,
             todoPendingCount = 0,

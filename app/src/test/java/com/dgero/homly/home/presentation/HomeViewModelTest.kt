@@ -1,8 +1,6 @@
 package com.dgero.homly.home.presentation
 
-import com.dgero.homly.auth.domain.model.User
 import com.dgero.homly.auth.domain.repository.SessionRepository
-import com.dgero.homly.auth.domain.repository.UserRepository
 import com.dgero.homly.auth.domain.usecase.LogoutUseCase
 import com.dgero.homly.calendar.domain.model.CalendarEvent
 import com.dgero.homly.calendar.domain.usecase.GetEventsUseCase
@@ -59,16 +57,6 @@ class HomeViewModelTest {
         }
     }
 
-    private class FakeUserRepository : UserRepository {
-        override suspend fun register(login: String, password: String): Result<User> =
-            Result.success(User(1, login))
-
-        override suspend fun login(login: String, password: String): Result<User> =
-            Result.success(User(1, login))
-
-        override suspend fun getUserById(id: Long): User? = User(id, "alex")
-    }
-
     private fun makeViewModel(
         calendarRepo: FakeCalendarEventRepository = FakeCalendarEventRepository(),
         shoppingRepo: FakeShoppingRepository = FakeShoppingRepository(),
@@ -77,7 +65,6 @@ class HomeViewModelTest {
     ): HomeViewModel {
         return HomeViewModel(
             logoutUseCase = LogoutUseCase(session),
-            userRepository = FakeUserRepository(),
             sessionRepository = session,
             getTodayEventsCount = GetTodayEventsCountUseCaseImpl(GetEventsUseCase(calendarRepo)),
             getUnboughtShoppingItemCount = GetUnboughtShoppingItemCountUseCaseImpl(shoppingRepo),
@@ -206,8 +193,6 @@ class HomeViewModelTest {
     fun `onLogout_stillCallsLogoutUseCaseAndOnDone`() = runTest {
         val session = FakeSessionRepository(initial = 1L)
         val vm = makeViewModel(session = session)
-        backgroundScope.launch { vm.login.collect {} }
-        advanceUntilIdle()
 
         var onDoneCalled = false
         vm.onLogout { onDoneCalled = true }

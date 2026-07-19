@@ -4,32 +4,23 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.dgero.homly.auth.domain.repository.SessionRepository
-import com.dgero.homly.auth.domain.repository.UserRepository
 import com.dgero.homly.auth.domain.usecase.LogoutUseCase
 import com.dgero.homly.calendar.domain.usecase.port.GetTodayEventsCountUseCase
 import com.dgero.homly.shopping.domain.usecase.port.GetUnboughtShoppingItemCountUseCase
 import com.dgero.homly.todolist.domain.usecase.port.GetPendingTodoCountUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class HomeViewModel(
     private val logoutUseCase: LogoutUseCase,
-    private val userRepository: UserRepository,
     private val sessionRepository: SessionRepository,
     private val getTodayEventsCount: GetTodayEventsCountUseCase,
     private val getUnboughtShoppingItemCount: GetUnboughtShoppingItemCountUseCase,
     private val getPendingTodoCount: GetPendingTodoCountUseCase,
 ) : ViewModel() {
-
-    val login = sessionRepository.currentUserId
-        .map { userId -> userId?.let { userRepository.getUserById(it)?.login } ?: "" }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), "")
 
     private var userId: Long? = null
 
@@ -75,7 +66,6 @@ class HomeViewModel(
 
     class Factory(
         private val logoutUseCase: LogoutUseCase,
-        private val userRepository: UserRepository,
         private val sessionRepository: SessionRepository,
         private val getTodayEventsCount: GetTodayEventsCountUseCase,
         private val getUnboughtShoppingItemCount: GetUnboughtShoppingItemCountUseCase,
@@ -85,7 +75,6 @@ class HomeViewModel(
         override fun <T : ViewModel> create(modelClass: Class<T>): T =
             HomeViewModel(
                 logoutUseCase = logoutUseCase,
-                userRepository = userRepository,
                 sessionRepository = sessionRepository,
                 getTodayEventsCount = getTodayEventsCount,
                 getUnboughtShoppingItemCount = getUnboughtShoppingItemCount,

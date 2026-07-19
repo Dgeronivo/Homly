@@ -100,7 +100,6 @@ private fun AuthGate(container: AppContainer) {
                     val vm: HomeViewModel = viewModel(
                         factory = HomeViewModel.Factory(
                             logoutUseCase = LogoutUseCase(container.sessionRepository),
-                            userRepository = container.userRepository,
                             sessionRepository = container.sessionRepository,
                             getTodayEventsCount = GetTodayEventsCountUseCaseImpl(
                                 GetEventsUseCase(container.calendarEventRepository),
