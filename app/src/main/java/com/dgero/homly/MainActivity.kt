@@ -25,6 +25,7 @@ import com.dgero.homly.calendar.domain.usecase.CreateEventUseCase
 import com.dgero.homly.calendar.domain.usecase.DeleteEventUseCase
 import com.dgero.homly.calendar.domain.usecase.GetEventByIdUseCase
 import com.dgero.homly.calendar.domain.usecase.GetEventsUseCase
+import com.dgero.homly.calendar.domain.usecase.GetTodayEventsCountUseCaseImpl
 import com.dgero.homly.calendar.domain.usecase.UpdateEventUseCase
 import com.dgero.homly.calendar.presentation.AddEditEventScreen
 import com.dgero.homly.calendar.presentation.AddEditEventViewModel
@@ -35,6 +36,7 @@ import com.dgero.homly.home.presentation.HomeViewModel
 import com.dgero.homly.shopping.domain.usecase.AddShoppingItemUseCase
 import com.dgero.homly.shopping.domain.usecase.DeleteShoppingItemUseCase
 import com.dgero.homly.shopping.domain.usecase.EditShoppingItemUseCase
+import com.dgero.homly.shopping.domain.usecase.GetUnboughtShoppingItemCountUseCaseImpl
 import com.dgero.homly.shopping.domain.usecase.ObserveShoppingItemsUseCase
 import com.dgero.homly.shopping.domain.usecase.ToggleShoppingItemUseCase
 import com.dgero.homly.shopping.presentation.ShoppingListScreen
@@ -43,6 +45,7 @@ import com.dgero.homly.todolist.domain.usecase.AddTodoItemUseCase
 import com.dgero.homly.todolist.domain.usecase.DeleteCompletedTodoItemsUseCase
 import com.dgero.homly.todolist.domain.usecase.DeleteTodoItemUseCase
 import com.dgero.homly.todolist.domain.usecase.EditTodoItemUseCase
+import com.dgero.homly.todolist.domain.usecase.GetPendingTodoCountUseCaseImpl
 import com.dgero.homly.todolist.domain.usecase.GetTodoItemsUseCase
 import com.dgero.homly.todolist.domain.usecase.ToggleTodoItemUseCase
 import com.dgero.homly.todolist.domain.validation.TodoTitleValidator
@@ -99,9 +102,13 @@ private fun AuthGate(container: AppContainer) {
                             logoutUseCase = LogoutUseCase(container.sessionRepository),
                             userRepository = container.userRepository,
                             sessionRepository = container.sessionRepository,
-                            getEventsUseCase = GetEventsUseCase(container.calendarEventRepository),
-                            observeShoppingItems = ObserveShoppingItemsUseCase(container.shoppingRepository),
-                            getTodoItems = GetTodoItemsUseCase(container.todoRepository),
+                            getTodayEventsCount = GetTodayEventsCountUseCaseImpl(
+                                GetEventsUseCase(container.calendarEventRepository),
+                            ),
+                            getUnboughtShoppingItemCount = GetUnboughtShoppingItemCountUseCaseImpl(
+                                container.shoppingRepository,
+                            ),
+                            getPendingTodoCount = GetPendingTodoCountUseCaseImpl(container.todoRepository),
                         )
                     )
                     HomeScreen(

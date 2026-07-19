@@ -6,31 +6,25 @@ import androidx.lifecycle.viewModelScope
 import com.dgero.homly.auth.domain.repository.SessionRepository
 import com.dgero.homly.auth.domain.repository.UserRepository
 import com.dgero.homly.auth.domain.usecase.LogoutUseCase
-import com.dgero.homly.calendar.domain.usecase.GetEventsUseCase
-import com.dgero.homly.shopping.domain.model.ShoppingSortOrder
-import com.dgero.homly.shopping.domain.usecase.ObserveShoppingItemsUseCase
-import com.dgero.homly.todolist.domain.usecase.GetTodoItemsUseCase
-import java.time.LocalDate
-import java.time.YearMonth
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import com.dgero.homly.calendar.domain.usecase.port.GetTodayEventsCountUseCase
+import com.dgero.homly.shopping.domain.usecase.port.GetUnboughtShoppingItemCountUseCase
+import com.dgero.homly.todolist.domain.usecase.port.GetPendingTodoCountUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class HomeViewModel(
     private val logoutUseCase: LogoutUseCase,
     private val userRepository: UserRepository,
     private val sessionRepository: SessionRepository,
-    private val getEventsUseCase: GetEventsUseCase,
-    observeShoppingItems: ObserveShoppingItemsUseCase,
-    private val getTodoItems: GetTodoItemsUseCase,
+    private val getTodayEventsCount: GetTodayEventsCountUseCase,
+    private val getUnboughtShoppingItemCount: GetUnboughtShoppingItemCountUseCase,
+    private val getPendingTodoCount: GetPendingTodoCountUseCase,
 ) : ViewModel() {
 
     val login = sessionRepository.currentUserId
@@ -45,36 +39,31 @@ class HomeViewModel(
     private val _todoPendingCount = MutableStateFlow(0)
     val todoPendingCount: StateFlow<Int> = _todoPendingCount
 
-    val shoppingActiveCount: StateFlow<Int> = sessionRepository.currentUserId
-        .filterNotNull()
-        .flatMapLatest { uid -> observeShoppingItems(uid, ShoppingSortOrder.DATE_DESC) }
-        .map { items -> items.count { !it.isBought } }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), 0)
+    private val _shoppingActiveCount = MutableStateFlow(0)
+    val shoppingActiveCount: StateFlow<Int> = _shoppingActiveCount
 
     init {
         viewModelScope.launch {
             val uid = sessionRepository.currentUserId.filterNotNull().first()
             userId = uid
-            loadSuspendCounts(uid)
+            loadCounts(uid)
         }
     }
 
     /**
-     * Re-fetches the suspend-sourced summary counts (today's events, pending todos) — called
-     * when [HomeScreen] resumes (e.g. returning from Calendar/Todo after changes), since this
-     * ViewModel instance survives that round-trip and would otherwise keep showing stale data.
-     * `shoppingActiveCount` doesn't need this: it's backed by a reactive [Flow] that updates
-     * itself.
+     * Re-fetches all summary counts — called when [HomeScreen] resumes (e.g. returning from
+     * Calendar/Shopping/Todo after changes), since this ViewModel instance survives that
+     * round-trip and would otherwise keep showing stale data.
      */
     fun refresh() {
         val uid = userId ?: return
-        viewModelScope.launch { loadSuspendCounts(uid) }
+        viewModelScope.launch { loadCounts(uid) }
     }
 
-    private suspend fun loadSuspendCounts(uid: Long) {
-        val monthEvents = getEventsUseCase(uid, YearMonth.now())
-        _todayEventsCount.value = GetEventsUseCase.forDay(monthEvents, LocalDate.now()).size
-        _todoPendingCount.value = getTodoItems(uid).count { !it.isDone }
+    private suspend fun loadCounts(uid: Long) {
+        _todayEventsCount.value = getTodayEventsCount(uid)
+        _shoppingActiveCount.value = getUnboughtShoppingItemCount(uid)
+        _todoPendingCount.value = getPendingTodoCount(uid)
     }
 
     fun onLogout(onDone: () -> Unit) {
@@ -88,9 +77,9 @@ class HomeViewModel(
         private val logoutUseCase: LogoutUseCase,
         private val userRepository: UserRepository,
         private val sessionRepository: SessionRepository,
-        private val getEventsUseCase: GetEventsUseCase,
-        private val observeShoppingItems: ObserveShoppingItemsUseCase,
-        private val getTodoItems: GetTodoItemsUseCase,
+        private val getTodayEventsCount: GetTodayEventsCountUseCase,
+        private val getUnboughtShoppingItemCount: GetUnboughtShoppingItemCountUseCase,
+        private val getPendingTodoCount: GetPendingTodoCountUseCase,
     ) : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>): T =
@@ -98,9 +87,9 @@ class HomeViewModel(
                 logoutUseCase = logoutUseCase,
                 userRepository = userRepository,
                 sessionRepository = sessionRepository,
-                getEventsUseCase = getEventsUseCase,
-                observeShoppingItems = observeShoppingItems,
-                getTodoItems = getTodoItems,
+                getTodayEventsCount = getTodayEventsCount,
+                getUnboughtShoppingItemCount = getUnboughtShoppingItemCount,
+                getPendingTodoCount = getPendingTodoCount,
             ) as T
     }
 }

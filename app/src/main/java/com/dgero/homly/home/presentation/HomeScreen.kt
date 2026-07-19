@@ -91,11 +91,7 @@ private fun HomeContent(
         Spacer(Modifier.height(24.dp))
         FeatureCard(
             title = "Shopping list",
-            summary = if (shoppingActiveCount > 0) {
-                "$shoppingActiveCount items left to buy"
-            } else {
-                "Shopping list is empty"
-            },
+            summary = if (shoppingActiveCount > 0) "$shoppingActiveCount items left to buy" else "Shopping list is empty",
             onClick = onOpenShoppingList,
         )
         Spacer(Modifier.height(8.dp))

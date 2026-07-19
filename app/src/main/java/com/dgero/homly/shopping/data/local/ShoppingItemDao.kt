@@ -14,6 +14,9 @@ interface ShoppingItemDao {
     @Query("SELECT COUNT(*) FROM shopping_items WHERE userId = :userId")
     suspend fun countByUser(userId: Long): Int
 
+    @Query("SELECT COUNT(*) FROM shopping_items WHERE userId = :userId AND isBought = 0")
+    suspend fun countNotBought(userId: Long): Int
+
     @Insert
     suspend fun insert(item: ShoppingItemEntity): Long
 

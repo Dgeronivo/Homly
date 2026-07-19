@@ -29,6 +29,9 @@ class FakeShoppingRepository(seed: List<ShoppingItem> = emptyList()) : ShoppingR
     override fun observeItems(userId: Long): Flow<List<ShoppingItem>> =
         state.map { items -> items.values.filter { owners[it.id] == userId } }
 
+    override suspend fun countNotBought(userId: Long): Int =
+        state.value.values.count { owners[it.id] == userId && !it.isBought }
+
     override suspend fun add(userId: Long, name: String): Result<ShoppingItem> {
         val countForUser = state.value.values.count { owners[it.id] == userId }
         if (countForUser >= ShoppingLimits.MAX_ITEMS) return Result.failure(ShoppingError.LimitReached)

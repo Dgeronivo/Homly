@@ -6,12 +6,13 @@ import com.dgero.homly.auth.domain.repository.UserRepository
 import com.dgero.homly.auth.domain.usecase.LogoutUseCase
 import com.dgero.homly.calendar.domain.model.CalendarEvent
 import com.dgero.homly.calendar.domain.usecase.GetEventsUseCase
+import com.dgero.homly.calendar.domain.usecase.GetTodayEventsCountUseCaseImpl
 import com.dgero.homly.calendar.fake.FakeCalendarEventRepository
 import com.dgero.homly.shopping.domain.FakeShoppingRepository
 import com.dgero.homly.shopping.domain.model.ShoppingItem
-import com.dgero.homly.shopping.domain.usecase.ObserveShoppingItemsUseCase
+import com.dgero.homly.shopping.domain.usecase.GetUnboughtShoppingItemCountUseCaseImpl
 import com.dgero.homly.todolist.domain.model.TodoItem
-import com.dgero.homly.todolist.domain.usecase.GetTodoItemsUseCase
+import com.dgero.homly.todolist.domain.usecase.GetPendingTodoCountUseCaseImpl
 import com.dgero.homly.todolist.fake.FakeTodoRepository
 import java.time.LocalDate
 import kotlinx.coroutines.Dispatchers
@@ -78,9 +79,9 @@ class HomeViewModelTest {
             logoutUseCase = LogoutUseCase(session),
             userRepository = FakeUserRepository(),
             sessionRepository = session,
-            getEventsUseCase = GetEventsUseCase(calendarRepo),
-            observeShoppingItems = ObserveShoppingItemsUseCase(shoppingRepo),
-            getTodoItems = GetTodoItemsUseCase(todoRepo),
+            getTodayEventsCount = GetTodayEventsCountUseCaseImpl(GetEventsUseCase(calendarRepo)),
+            getUnboughtShoppingItemCount = GetUnboughtShoppingItemCountUseCaseImpl(shoppingRepo),
+            getPendingTodoCount = GetPendingTodoCountUseCaseImpl(todoRepo),
         )
     }
 
@@ -135,7 +136,7 @@ class HomeViewModelTest {
     }
 
     @Test
-    fun `shoppingActiveCount_updatesReactivelyOnItemChange`() = runTest {
+    fun `shoppingActiveCount_updatesOnlyAfterRefresh`() = runTest {
         val shoppingRepo = FakeShoppingRepository()
         val session = FakeSessionRepository()
         val vm = makeViewModel(shoppingRepo = shoppingRepo, session = session)
@@ -145,9 +146,15 @@ class HomeViewModelTest {
 
         assertEquals(0, vm.shoppingActiveCount.value)
 
-        // Simulates ShoppingListViewModel adding an item via the same repository, without
-        // calling any HomeViewModel method — the Flow-backed count should update itself.
+        // Simulates ShoppingListViewModel adding an item via the same repository, while this
+        // HomeViewModel instance is still alive (e.g. Home in the back stack). No live update
+        // is expected — the count is a one-shot fetch, refreshed only via refresh().
         shoppingRepo.add(1L, "Milk")
+        advanceUntilIdle()
+
+        assertEquals(0, vm.shoppingActiveCount.value)
+
+        vm.refresh()
         advanceUntilIdle()
 
         assertEquals(1, vm.shoppingActiveCount.value)

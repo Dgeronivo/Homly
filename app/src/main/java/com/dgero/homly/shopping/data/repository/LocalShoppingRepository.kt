@@ -18,6 +18,8 @@ class LocalShoppingRepository(
     override fun observeItems(userId: Long): Flow<List<ShoppingItem>> =
         dao.observeByUser(userId).map { entities -> entities.map { it.toDomain() } }
 
+    override suspend fun countNotBought(userId: Long): Int = dao.countNotBought(userId)
+
     override suspend fun add(userId: Long, name: String): Result<ShoppingItem> = try {
         val item = runTransaction {
             if (dao.countByUser(userId) >= ShoppingLimits.MAX_ITEMS) throw ShoppingError.LimitReached
