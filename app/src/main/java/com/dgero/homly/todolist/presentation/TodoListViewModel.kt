@@ -8,6 +8,7 @@ import com.dgero.homly.todolist.domain.error.TodoError
 import com.dgero.homly.todolist.domain.model.TodoItem
 import com.dgero.homly.todolist.domain.model.TodoLimits
 import com.dgero.homly.todolist.domain.usecase.AddTodoItemUseCase
+import com.dgero.homly.todolist.domain.usecase.DeleteCompletedTodoItemsUseCase
 import com.dgero.homly.todolist.domain.usecase.DeleteTodoItemUseCase
 import com.dgero.homly.todolist.domain.usecase.EditTodoItemUseCase
 import com.dgero.homly.todolist.domain.usecase.GetTodoItemsUseCase
@@ -28,6 +29,7 @@ class TodoListViewModel(
     private val editItem: EditTodoItemUseCase,
     private val toggleItem: ToggleTodoItemUseCase,
     private val deleteItem: DeleteTodoItemUseCase,
+    private val deleteCompletedItems: DeleteCompletedTodoItemsUseCase,
     private val validator: TodoTitleValidator,
     private val sessionRepository: SessionRepository,
 ) : ViewModel() {
@@ -36,6 +38,7 @@ class TodoListViewModel(
     private val titleError = MutableStateFlow<String?>(null)
     private val formError = MutableStateFlow<String?>(null)
     private val _items = MutableStateFlow<List<TodoItem>>(emptyList())
+    private val _showActiveOnly = MutableStateFlow(false)
 
     private var userId: Long? = null
 
@@ -48,14 +51,16 @@ class TodoListViewModel(
     }
 
     val uiState: StateFlow<TodoListUiState> = combine(
-        _items, newItemTitle, titleError, formError,
-    ) { currentItems, title, tError, fError ->
+        _items, newItemTitle, titleError, formError, _showActiveOnly,
+    ) { currentItems, title, tError, fError, showActiveOnly ->
         TodoListUiState(
-            items = currentItems,
+            items = if (showActiveOnly) currentItems.filterNot { it.isDone } else currentItems,
             newItemTitle = title,
             isLimitReached = currentItems.size >= TodoLimits.MAX_ITEMS,
             titleError = tError,
             formError = fError,
+            showActiveOnly = showActiveOnly,
+            completedCount = currentItems.count { it.isDone },
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), TodoListUiState())
 
@@ -131,19 +136,34 @@ class TodoListViewModel(
         }
     }
 
+    fun onToggleActiveOnly() {
+        _showActiveOnly.value = !_showActiveOnly.value
+    }
+
+    fun onClearCompleted() {
+        val uid = userId ?: return
+        viewModelScope.launch {
+            deleteCompletedItems(uid).onSuccess {
+                _items.value = _items.value.filterNot { it.isDone }
+            }
+        }
+    }
+
     class Factory(
         private val getItems: GetTodoItemsUseCase,
         private val addItem: AddTodoItemUseCase,
         private val editItem: EditTodoItemUseCase,
         private val toggleItem: ToggleTodoItemUseCase,
         private val deleteItem: DeleteTodoItemUseCase,
+        private val deleteCompletedItems: DeleteCompletedTodoItemsUseCase,
         private val validator: TodoTitleValidator,
         private val sessionRepository: SessionRepository,
     ) : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>): T =
             TodoListViewModel(
-                getItems, addItem, editItem, toggleItem, deleteItem, validator, sessionRepository,
+                getItems, addItem, editItem, toggleItem, deleteItem, deleteCompletedItems,
+                validator, sessionRepository,
             ) as T
     }
 }

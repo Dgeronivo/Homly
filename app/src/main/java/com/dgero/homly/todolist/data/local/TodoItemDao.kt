@@ -22,4 +22,7 @@ interface TodoItemDao {
 
     @Query("DELETE FROM todo_items WHERE id = :id AND userId = :userId")
     suspend fun deleteById(id: Long, userId: Long): Int
+
+    @Query("DELETE FROM todo_items WHERE userId = :userId AND isDone = 1")
+    suspend fun deleteCompleted(userId: Long): Int
 }

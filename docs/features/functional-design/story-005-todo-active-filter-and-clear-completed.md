@@ -133,11 +133,11 @@ class DeleteCompletedTodoItemsUseCase(private val repository: TodoRepository) {
 
 ## Definition of done
 
-- [ ] Чіп "Active only" приховує/показує виконані елементи без перезапиту з БД
-- [ ] Кнопка "Очистити виконані" неактивна, коли виконаних елементів немає
-- [ ] Клік по "Очистити виконані" вимагає підтвердження і видаляє всі виконані одним запитом
-- [ ] `TodoRepository`/`LocalTodoRepository`/`TodoItemDao` мають новий метод `deleteCompleted`, покритий тестами
-- [ ] `make rebuild` — зелений
-- [ ] `make test` — зелений (`DeleteCompletedTodoItemsUseCaseTest`, `TodoListViewModelTest`)
-- [ ] `make connected-test` — зелений (`TodoItemDaoTest`, `LocalTodoRepositoryTest`)
-- [ ] Усі зміни сторі закомічені одним комітом
+- [x] Чіп "Active only" приховує/показує виконані елементи без перезапиту з БД
+- [x] Кнопка "Очистити виконані" неактивна, коли виконаних елементів немає
+- [x] Клік по "Очистити виконані" вимагає підтвердження і видаляє всі виконані одним запитом
+- [x] `TodoRepository`/`LocalTodoRepository`/`TodoItemDao` мають новий метод `deleteCompleted`, покритий тестами
+- [x] `make rebuild` — зелений
+- [x] `make test` — зелений (`DeleteCompletedTodoItemsUseCaseTest`, `TodoListViewModelTest`)
+- [ ] `make connected-test` — зелений (`TodoItemDaoTest`, `LocalTodoRepositoryTest`) — пропущено: жодного підключеного пристрою/емулятора (`adb devices` — порожньо)
+- [x] Усі зміни сторі закомічені одним комітом

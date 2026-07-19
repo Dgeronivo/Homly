@@ -1,6 +1,7 @@
 package com.dgero.homly.todolist.presentation
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -13,18 +14,22 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -53,6 +58,8 @@ fun TodoListScreen(
         onToggle = viewModel::onToggle,
         onEdit = viewModel::onEdit,
         onDelete = viewModel::onDelete,
+        onToggleActiveOnly = viewModel::onToggleActiveOnly,
+        onClearCompleted = viewModel::onClearCompleted,
     )
 }
 
@@ -66,7 +73,11 @@ private fun TodoListContent(
     onToggle: (TodoItem) -> Unit,
     onEdit: (Long, String) -> Unit,
     onDelete: (Long) -> Unit,
+    onToggleActiveOnly: () -> Unit,
+    onClearCompleted: () -> Unit,
 ) {
+    var showClearConfirm by remember { mutableStateOf(false) }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -92,6 +103,12 @@ private fun TodoListContent(
                 onTitleChange = onNewItemTitleChange,
                 onAdd = onAdd,
             )
+            TodoListControls(
+                showActiveOnly = uiState.showActiveOnly,
+                isClearEnabled = uiState.completedCount > 0,
+                onToggleActiveOnly = onToggleActiveOnly,
+                onClearCompletedClick = { showClearConfirm = true },
+            )
             if (uiState.items.isEmpty()) {
                 EmptyState()
             } else {
@@ -107,6 +124,88 @@ private fun TodoListContent(
                 }
             }
         }
+    }
+
+    if (showClearConfirm) {
+        ClearCompletedConfirmDialog(
+            completedCount = uiState.completedCount,
+            onConfirm = {
+                onClearCompleted()
+                showClearConfirm = false
+            },
+            onDismiss = { showClearConfirm = false },
+        )
+    }
+}
+
+@Composable
+private fun TodoListControls(
+    showActiveOnly: Boolean,
+    isClearEnabled: Boolean,
+    onToggleActiveOnly: () -> Unit,
+    onClearCompletedClick: () -> Unit,
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(bottom = 8.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        FilterChip(
+            selected = showActiveOnly,
+            onClick = onToggleActiveOnly,
+            label = { Text("Active only") },
+        )
+        Button(
+            onClick = onClearCompletedClick,
+            enabled = isClearEnabled,
+        ) {
+            Text("Clear completed")
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun TodoListControlsPreview() {
+    HomlyTheme {
+        TodoListControls(
+            showActiveOnly = false,
+            isClearEnabled = true,
+            onToggleActiveOnly = {},
+            onClearCompletedClick = {},
+        )
+    }
+}
+
+@Composable
+private fun ClearCompletedConfirmDialog(
+    completedCount: Int,
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit,
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Delete $completedCount completed tasks?") },
+        confirmButton = {
+            TextButton(onClick = onConfirm) { Text("Delete") }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) { Text("Cancel") }
+        },
+    )
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun ClearCompletedConfirmDialogPreview() {
+    HomlyTheme {
+        ClearCompletedConfirmDialog(
+            completedCount = 3,
+            onConfirm = {},
+            onDismiss = {},
+        )
     }
 }
 
@@ -231,6 +330,7 @@ private fun TodoListContentPreview() {
                     TodoItem(id = 1, title = "Buy milk", isDone = false, createdAt = 2),
                     TodoItem(id = 2, title = "Call doctor", isDone = true, createdAt = 1),
                 ),
+                completedCount = 1,
             ),
             onBack = {},
             onNewItemTitleChange = {},
@@ -238,6 +338,8 @@ private fun TodoListContentPreview() {
             onToggle = {},
             onEdit = { _, _ -> },
             onDelete = {},
+            onToggleActiveOnly = {},
+            onClearCompleted = {},
         )
     }
 }
@@ -254,6 +356,8 @@ private fun TodoListEmptyPreview() {
             onToggle = {},
             onEdit = { _, _ -> },
             onDelete = {},
+            onToggleActiveOnly = {},
+            onClearCompleted = {},
         )
     }
 }

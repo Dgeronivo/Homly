@@ -120,4 +120,29 @@ class TodoItemDaoTest {
         assertEquals(0, rows)
         assertEquals(1, dao.getByUser(1).size)
     }
+
+    @Test
+    fun deleteCompleted_removesOnlyDoneItemsForThatUser() = runTest {
+        dao.insert(TodoItemEntity(userId = 1, title = "Done task", isDone = true))
+        dao.insert(TodoItemEntity(userId = 1, title = "Active task", isDone = false))
+        val otherUserDoneId = dao.insert(TodoItemEntity(userId = 2, title = "Other done", isDone = true))
+
+        val rows = dao.deleteCompleted(1)
+
+        assertEquals(1, rows)
+        val remaining = dao.getByUser(1)
+        assertEquals(listOf("Active task"), remaining.map { it.title })
+        assertEquals(1, dao.getByUser(2).size)
+        assertEquals(otherUserDoneId, dao.getByUser(2).single().id)
+    }
+
+    @Test
+    fun deleteCompleted_noCompletedItems_returnsZeroAndDeletesNothing() = runTest {
+        dao.insert(TodoItemEntity(userId = 1, title = "Active task", isDone = false))
+
+        val rows = dao.deleteCompleted(1)
+
+        assertEquals(0, rows)
+        assertEquals(1, dao.getByUser(1).size)
+    }
 }

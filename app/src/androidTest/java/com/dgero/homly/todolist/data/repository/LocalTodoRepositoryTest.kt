@@ -131,4 +131,19 @@ class LocalTodoRepositoryTest {
         assertEquals(TodoError.Unauthorized, result.exceptionOrNull())
         assertEquals(1, repository.getItems(1).size)
     }
+
+    @Test
+    fun deleteCompleted_isScopedPerUser() = runTest {
+        val user1Done = repository.add(1, "Done task").getOrThrow()
+        repository.toggleDone(user1Done.id, 1, true)
+        val user1Active = repository.add(1, "Active task").getOrThrow()
+        val user2Done = repository.add(2, "Other done").getOrThrow()
+        repository.toggleDone(user2Done.id, 2, true)
+
+        val result = repository.deleteCompleted(1)
+
+        assertEquals(1, result.getOrNull())
+        assertEquals(listOf(user1Active.id), repository.getItems(1).map { it.id })
+        assertEquals(listOf(user2Done.id), repository.getItems(2).map { it.id })
+    }
 }

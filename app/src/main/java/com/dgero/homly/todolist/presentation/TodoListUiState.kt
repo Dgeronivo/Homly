@@ -8,4 +8,6 @@ data class TodoListUiState(
     val isLimitReached: Boolean = false,
     val titleError: String? = null,
     val formError: String? = null,
+    val showActiveOnly: Boolean = false,
+    val completedCount: Int = 0,
 )

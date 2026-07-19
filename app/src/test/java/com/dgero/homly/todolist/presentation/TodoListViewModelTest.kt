@@ -3,6 +3,7 @@ package com.dgero.homly.todolist.presentation
 import com.dgero.homly.todolist.domain.model.TodoItem
 import com.dgero.homly.todolist.domain.model.TodoLimits
 import com.dgero.homly.todolist.domain.usecase.AddTodoItemUseCase
+import com.dgero.homly.todolist.domain.usecase.DeleteCompletedTodoItemsUseCase
 import com.dgero.homly.todolist.domain.usecase.DeleteTodoItemUseCase
 import com.dgero.homly.todolist.domain.usecase.EditTodoItemUseCase
 import com.dgero.homly.todolist.domain.usecase.GetTodoItemsUseCase
@@ -20,6 +21,7 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -50,6 +52,7 @@ class TodoListViewModelTest {
             editItem = EditTodoItemUseCase(repo, TodoTitleValidator),
             toggleItem = ToggleTodoItemUseCase(repo),
             deleteItem = DeleteTodoItemUseCase(repo),
+            deleteCompletedItems = DeleteCompletedTodoItemsUseCase(repo),
             validator = TodoTitleValidator,
             sessionRepository = session,
         )
@@ -208,5 +211,85 @@ class TodoListViewModelTest {
 
         assertNull(vm.uiState.value.titleError)
         assertNull(vm.uiState.value.formError)
+    }
+
+    @Test
+    fun `onToggleActiveOnly_hidesCompletedItemsInUiState`() = runTest {
+        val repo = FakeTodoRepository()
+        val session = FakeSessionRepository()
+        repo.seedItem(1L, TodoItem(id = 1, title = "active", isDone = false, createdAt = 1L))
+        repo.seedItem(1L, TodoItem(id = 2, title = "done", isDone = true, createdAt = 2L))
+
+        val vm = makeViewModel(repo, session)
+        backgroundScope.launch { vm.uiState.collect {} }
+        session.setSession(1L)
+        advanceUntilIdle()
+
+        vm.onToggleActiveOnly()
+        advanceUntilIdle()
+
+        assertEquals(1, vm.uiState.value.items.size)
+        assertEquals("active", vm.uiState.value.items[0].title)
+        assertTrue(vm.uiState.value.showActiveOnly)
+    }
+
+    @Test
+    fun `onToggleActiveOnly_toggledOff_showsAllItemsAgain`() = runTest {
+        val repo = FakeTodoRepository()
+        val session = FakeSessionRepository()
+        repo.seedItem(1L, TodoItem(id = 1, title = "active", isDone = false, createdAt = 1L))
+        repo.seedItem(1L, TodoItem(id = 2, title = "done", isDone = true, createdAt = 2L))
+
+        val vm = makeViewModel(repo, session)
+        backgroundScope.launch { vm.uiState.collect {} }
+        session.setSession(1L)
+        advanceUntilIdle()
+
+        vm.onToggleActiveOnly()
+        advanceUntilIdle()
+        vm.onToggleActiveOnly()
+        advanceUntilIdle()
+
+        assertEquals(2, vm.uiState.value.items.size)
+        assertFalse(vm.uiState.value.showActiveOnly)
+    }
+
+    @Test
+    fun `onClearCompleted_removesAllDoneItemsFromState`() = runTest {
+        val repo = FakeTodoRepository()
+        val session = FakeSessionRepository()
+        repo.seedItem(1L, TodoItem(id = 1, title = "active", isDone = false, createdAt = 1L))
+        repo.seedItem(1L, TodoItem(id = 2, title = "done1", isDone = true, createdAt = 2L))
+        repo.seedItem(1L, TodoItem(id = 3, title = "done2", isDone = true, createdAt = 3L))
+
+        val vm = makeViewModel(repo, session)
+        backgroundScope.launch { vm.uiState.collect {} }
+        session.setSession(1L)
+        advanceUntilIdle()
+
+        vm.onClearCompleted()
+        advanceUntilIdle()
+
+        assertEquals(1, vm.uiState.value.items.size)
+        assertEquals("active", vm.uiState.value.items[0].title)
+        assertEquals(0, vm.uiState.value.completedCount)
+    }
+
+    @Test
+    fun `onClearCompleted_noCompletedItems_noOpSafely`() = runTest {
+        val repo = FakeTodoRepository()
+        val session = FakeSessionRepository()
+        repo.seedItem(1L, TodoItem(id = 1, title = "active", isDone = false, createdAt = 1L))
+
+        val vm = makeViewModel(repo, session)
+        backgroundScope.launch { vm.uiState.collect {} }
+        session.setSession(1L)
+        advanceUntilIdle()
+
+        vm.onClearCompleted()
+        advanceUntilIdle()
+
+        assertEquals(1, vm.uiState.value.items.size)
+        assertEquals("active", vm.uiState.value.items[0].title)
     }
 }

@@ -38,6 +38,12 @@ class LocalTodoRepository(
     override suspend fun delete(id: Long, userId: Long): Result<Unit> =
         runMutation { dao.deleteById(id, userId) }
 
+    override suspend fun deleteCompleted(userId: Long): Result<Int> = try {
+        Result.success(dao.deleteCompleted(userId))
+    } catch (e: Exception) {
+        Result.failure(TodoError.Unknown(e))
+    }
+
     private suspend fun runMutation(block: suspend () -> Int): Result<Unit> = try {
         if (block() == 0) Result.failure(TodoError.Unauthorized)
         else Result.success(Unit)

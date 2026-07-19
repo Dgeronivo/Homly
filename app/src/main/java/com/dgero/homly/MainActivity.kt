@@ -40,6 +40,7 @@ import com.dgero.homly.shopping.domain.usecase.ToggleShoppingItemUseCase
 import com.dgero.homly.shopping.presentation.ShoppingListScreen
 import com.dgero.homly.shopping.presentation.ShoppingListViewModel
 import com.dgero.homly.todolist.domain.usecase.AddTodoItemUseCase
+import com.dgero.homly.todolist.domain.usecase.DeleteCompletedTodoItemsUseCase
 import com.dgero.homly.todolist.domain.usecase.DeleteTodoItemUseCase
 import com.dgero.homly.todolist.domain.usecase.EditTodoItemUseCase
 import com.dgero.homly.todolist.domain.usecase.GetTodoItemsUseCase
@@ -123,6 +124,7 @@ private fun AuthGate(container: AppContainer) {
                             editItem = EditTodoItemUseCase(container.todoRepository, TodoTitleValidator),
                             toggleItem = ToggleTodoItemUseCase(container.todoRepository),
                             deleteItem = DeleteTodoItemUseCase(container.todoRepository),
+                            deleteCompletedItems = DeleteCompletedTodoItemsUseCase(container.todoRepository),
                             validator = TodoTitleValidator,
                             sessionRepository = container.sessionRepository,
                         )

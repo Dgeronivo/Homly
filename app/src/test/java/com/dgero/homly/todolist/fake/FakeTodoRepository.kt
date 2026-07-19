@@ -44,6 +44,15 @@ class FakeTodoRepository : TodoRepository {
         return Result.success(Unit)
     }
 
+    override suspend fun deleteCompleted(userId: Long): Result<Int> {
+        val completedIds = items.values.filter { it.isDone && owners[it.id] == userId }.map { it.id }
+        completedIds.forEach {
+            items.remove(it)
+            owners.remove(it)
+        }
+        return Result.success(completedIds.size)
+    }
+
     /** Test helper: insert a pre-built item with exact field values (e.g. specific createdAt). */
     fun seedItem(userId: Long, item: TodoItem) {
         items[item.id] = item

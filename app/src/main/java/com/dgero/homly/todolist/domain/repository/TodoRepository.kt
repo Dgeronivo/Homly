@@ -8,4 +8,5 @@ interface TodoRepository {
     suspend fun editTitle(id: Long, userId: Long, title: String): Result<Unit>
     suspend fun toggleDone(id: Long, userId: Long, isDone: Boolean): Result<Unit>
     suspend fun delete(id: Long, userId: Long): Result<Unit>
+    suspend fun deleteCompleted(userId: Long): Result<Int>
 }
