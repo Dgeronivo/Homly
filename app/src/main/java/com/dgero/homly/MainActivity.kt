@@ -98,6 +98,9 @@ private fun AuthGate(container: AppContainer) {
                             logoutUseCase = LogoutUseCase(container.sessionRepository),
                             userRepository = container.userRepository,
                             sessionRepository = container.sessionRepository,
+                            getEventsUseCase = GetEventsUseCase(container.calendarEventRepository),
+                            observeShoppingItems = ObserveShoppingItemsUseCase(container.shoppingRepository),
+                            getTodoItems = GetTodoItemsUseCase(container.todoRepository),
                         )
                     )
                     HomeScreen(

@@ -95,10 +95,10 @@
 
 ## Definition of done
 
-- [ ] Home показує 3 картки з актуальним зведенням замість голих кнопок
-- [ ] Дані на картках оновлюються при поверненні на Home після дій в Calendar/Shopping/Todo
-- [ ] Log out вимагає підтвердження діалогом
-- [ ] Навігаційні колбеки (`onOpenShoppingList`, `onOpenTodoList`, `onOpenCalendar`) не змінили сигнатуру
-- [ ] `make rebuild` — зелений
-- [ ] `make test` — `HomeViewModelTest` зелений
-- [ ] Усі зміни сторі закомічені одним комітом
+- [x] Home показує 3 картки з актуальним зведенням замість голих кнопок
+- [x] Дані на картках оновлюються при поверненні на Home після дій в Calendar/Shopping/Todo
+- [x] Log out вимагає підтвердження діалогом
+- [x] Навігаційні колбеки (`onOpenShoppingList`, `onOpenTodoList`, `onOpenCalendar`) не змінили сигнатуру
+- [x] `make rebuild` — зелений
+- [x] `make test` — `HomeViewModelTest` зелений
+- [x] Усі зміни сторі закомічені одним комітом
