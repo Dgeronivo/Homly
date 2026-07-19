@@ -33,3 +33,20 @@
 - `LoginViewModel`, `RegisterViewModel`, `LoginUiState`, `RegisterUiState` — без змін.
 - Юніт-тестів не додано (зміни суто UI-локальні, без впливу на бізнес-логіку — відповідно до плану сторі).
 - `make rebuild` і `make test` зелені.
+
+## Story 003 — Кнопка "Сьогодні" в календарі
+
+**Дата:** 2026-07-19
+
+### Проблеми під час реалізації
+- без відхилень від плану (єдина технічна заминка — не пов'язана з кодом сторі: `gradlew clean` спершу впав через заблокований файл від завислого Gradle-демона; вирішено через `gradlew --stop` перед повторним запуском).
+
+### Рішення
+- Реалізовано точно за описом у `story-003-calendar-today-chip.md`: новий метод `onTodayClick()` у `CalendarViewModel` напряму встановлює поточний місяць і сьогоднішню дату (без `clampToMonth`, на відміну від `onMonthChanged`), чіп `TextButton("Сьогодні")` додано в `MonthHeader` поруч з іконкою вибору місяця/року, видимий завжди.
+
+### Зміни
+- `CalendarViewModel.kt` — доданий метод `onTodayClick()`.
+- `CalendarScreen.kt` — `MonthHeader` отримав параметр `onTodayClick`, у ньому додано `TextButton("Сьогодні")`; `CalendarContent`/`CalendarScreen` прокидають `viewModel::onTodayClick`; оновлено preview-и `CalendarContent`, додано новий preview `MonthHeaderPreview`.
+- `CalendarUiState.kt` — без змін (нових полів не додано).
+- Новий unit-тести в `CalendarViewModelTest.kt` (3 тести): зміна місяця на поточний з будь-якого іншого, обраний день = сьогодні (а не clamp попереднього дня), перезавантаження подій під новий місяць.
+- `make rebuild` і `make test` зелені; усі 13 тестів `CalendarViewModelTest` (включно з 3 новими) проходять.

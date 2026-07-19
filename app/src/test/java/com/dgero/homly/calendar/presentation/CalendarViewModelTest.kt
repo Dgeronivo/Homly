@@ -318,4 +318,72 @@ class CalendarViewModelTest {
 
         assertNotNull(vm.eventLimitReached.first())
     }
+
+    @Test
+    fun `onTodayClick_fromAnotherMonth_setsCurrentYearMonthToNow`() = runTest {
+        val repo = FakeCalendarEventRepository()
+        val session = FakeSessionRepository()
+
+        val vm = makeViewModel(repo, session)
+        backgroundScope.launch { vm.uiState.collect {} }
+        session.setSession(1L)
+        advanceUntilIdle()
+
+        vm.onMonthChanged(YearMonth.of(2020, 1))
+        advanceUntilIdle()
+
+        vm.onTodayClick()
+        advanceUntilIdle()
+
+        assertEquals(YearMonth.now(), vm.uiState.value.currentYearMonth)
+    }
+
+    @Test
+    fun `onTodayClick_afterSelectingOtherDay_setsSelectedDateToToday`() = runTest {
+        val repo = FakeCalendarEventRepository()
+        val session = FakeSessionRepository()
+
+        val vm = makeViewModel(repo, session)
+        backgroundScope.launch { vm.uiState.collect {} }
+        session.setSession(1L)
+        advanceUntilIdle()
+
+        // Picks a day-of-month that would survive clampToMonth unchanged, proving onTodayClick
+        // sets today's date directly rather than clamping the previously selected day.
+        vm.onDateSelected(LocalDate.of(2020, 1, 5))
+        advanceUntilIdle()
+
+        vm.onTodayClick()
+        advanceUntilIdle()
+
+        assertEquals(LocalDate.now(), vm.uiState.value.selectedDate)
+    }
+
+    @Test
+    fun `onTodayClick_reloadsEventsForCurrentMonth`() = runTest {
+        val repo = FakeCalendarEventRepository()
+        val session = FakeSessionRepository()
+        val today = LocalDate.now()
+        val todayEvent = CalendarEvent(
+            id = 1, userId = 1, title = "Today's event", date = today,
+            isAllDay = true, startTime = null, endTime = null,
+        )
+        repo.seedEvent(todayEvent)
+
+        val vm = makeViewModel(repo, session)
+        backgroundScope.launch { vm.uiState.collect {} }
+        session.setSession(1L)
+        advanceUntilIdle()
+
+        vm.onMonthChanged(YearMonth.of(2020, 1))
+        advanceUntilIdle()
+        assertTrue(vm.uiState.value.selectedDayEvents.isEmpty())
+
+        vm.onTodayClick()
+        advanceUntilIdle()
+
+        val state = vm.uiState.value
+        assertTrue(state.daysWithEvents.contains(today))
+        assertEquals(listOf(1L), state.selectedDayEvents.map { it.id })
+    }
 }

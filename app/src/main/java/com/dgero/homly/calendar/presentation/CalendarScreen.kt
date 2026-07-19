@@ -110,6 +110,7 @@ fun CalendarScreen(
         snackbarHostState = snackbarHostState,
         onDateSelected = viewModel::onDateSelected,
         onMonthChanged = viewModel::onMonthChanged,
+        onTodayClick = viewModel::onTodayClick,
         onDeleteEvent = viewModel::onDeleteEvent,
         onEventClick = onEventClick,
         onFabClick = viewModel::onAddEventClick,
@@ -122,6 +123,7 @@ private fun CalendarContent(
     snackbarHostState: SnackbarHostState,
     onDateSelected: (LocalDate) -> Unit,
     onMonthChanged: (YearMonth) -> Unit,
+    onTodayClick: () -> Unit,
     onDeleteEvent: (Long) -> Unit,
     onEventClick: (Long) -> Unit,
     onFabClick: () -> Unit,
@@ -145,6 +147,7 @@ private fun CalendarContent(
             MonthHeader(
                 yearMonth = uiState.currentYearMonth,
                 onPickerClick = { showMonthYearPicker = true },
+                onTodayClick = onTodayClick,
             )
             Spacer(Modifier.height(8.dp))
             MonthGrid(
@@ -178,7 +181,7 @@ private fun CalendarContent(
 }
 
 @Composable
-private fun MonthHeader(yearMonth: YearMonth, onPickerClick: () -> Unit) {
+private fun MonthHeader(yearMonth: YearMonth, onPickerClick: () -> Unit, onTodayClick: () -> Unit) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -188,9 +191,26 @@ private fun MonthHeader(yearMonth: YearMonth, onPickerClick: () -> Unit) {
             text = yearMonth.format(MONTH_HEADER_FORMATTER),
             style = MaterialTheme.typography.headlineSmall,
         )
-        IconButton(onClick = onPickerClick) {
-            Icon(Icons.Default.DateRange, contentDescription = "Pick month and year")
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            TextButton(onClick = onTodayClick) {
+                Text("Сьогодні")
+            }
+            IconButton(onClick = onPickerClick) {
+                Icon(Icons.Default.DateRange, contentDescription = "Pick month and year")
+            }
         }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun MonthHeaderPreview() {
+    HomlyTheme {
+        MonthHeader(
+            yearMonth = YearMonth.of(2026, 5),
+            onPickerClick = {},
+            onTodayClick = {},
+        )
     }
 }
 
@@ -534,6 +554,7 @@ private fun CalendarContentPreview() {
             snackbarHostState = remember { SnackbarHostState() },
             onDateSelected = {},
             onMonthChanged = {},
+            onTodayClick = {},
             onDeleteEvent = {},
             onEventClick = {},
             onFabClick = {},
@@ -550,6 +571,7 @@ private fun CalendarContentEmptyDayPreview() {
             snackbarHostState = remember { SnackbarHostState() },
             onDateSelected = {},
             onMonthChanged = {},
+            onTodayClick = {},
             onDeleteEvent = {},
             onEventClick = {},
             onFabClick = {},

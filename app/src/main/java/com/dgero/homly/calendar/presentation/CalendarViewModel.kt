@@ -76,6 +76,18 @@ class CalendarViewModel(
         yearMonth.atDay(minOf(date.dayOfMonth, yearMonth.lengthOfMonth()))
 
     /**
+     * Jumps straight back to today (the "Сьогодні" chip): switches the visible month to the
+     * current one and selects today's date. Doesn't reuse [onMonthChanged] because its
+     * [clampToMonth] would keep the previously selected day-of-month instead of today's.
+     */
+    fun onTodayClick() {
+        val today = LocalDate.now()
+        _currentYearMonth.value = YearMonth.from(today)
+        _selectedDate.value = today
+        viewModelScope.launch { loadMonth(_currentYearMonth.value) }
+    }
+
+    /**
      * Re-fetches the currently displayed month. Called when [CalendarScreen] resumes (e.g.
      * returning from creating/editing an event in a separate nav destination — AC-05/AC-06),
      * since this ViewModel instance survives that round-trip and would otherwise keep serving

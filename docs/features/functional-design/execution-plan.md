@@ -10,7 +10,7 @@
 |---|---|---|
 | 1 | [story-001-feature-summary-cards.md](story-001-feature-summary-cards.md) | ✅ готово |
 | 2 | [story-002-login-show-password.md](story-002-login-show-password.md) | ✅ готово |
-| 3 | [story-003-calendar-today-chip.md](story-003-calendar-today-chip.md) | ⏳ не почато |
+| 3 | [story-003-calendar-today-chip.md](story-003-calendar-today-chip.md) | ✅ готово |
 | 4 | [story-005-todo-active-filter-and-clear-completed.md](story-005-todo-active-filter-and-clear-completed.md) | ⏳ не почато |
 
 Статуси: ⏳ не почато → 🔄 в роботі → 🔧 на доопрацюванні (ревью з зауваженнями) → ✅ готово.
