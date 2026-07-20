@@ -1,7 +1,6 @@
 package com.dgero.homly.calendar.presentation
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -18,12 +17,13 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -76,6 +76,15 @@ private val MONTH_HEADER_FORMATTER = DateTimeFormatter.ofPattern("MMMM yyyy")
 private val TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm")
 private const val GRID_WEEKS = 6
 internal const val MONTH_PAGER_TEST_TAG = "monthPager"
+
+// "Rounded Squares" shape language: soft rounded squares replace circles across the
+// today-badge, day-selection highlight, event dot, FAB and event rows.
+private val TodayBadgeShape = RoundedCornerShape(9.dp)
+private val SelectedDayShape = RoundedCornerShape(10.dp)
+private val EventDotShape = RoundedCornerShape(1.dp)
+private val FabShape = RoundedCornerShape(16.dp)
+private val EventCardShape = RoundedCornerShape(12.dp)
+private const val SELECTED_NOT_TODAY_ALPHA = 0.35f
 
 /**
  * Month grid + selected day's event list (SAD Flow 1).
@@ -168,7 +177,7 @@ internal fun CalendarContent(
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         floatingActionButton = {
-            FloatingActionButton(onClick = onFabClick) {
+            FloatingActionButton(onClick = onFabClick, shape = FabShape) {
                 Icon(Icons.Default.Add, contentDescription = stringResource(R.string.add_event))
             }
         },
@@ -252,7 +261,7 @@ private fun TodayButton(onClick: () -> Unit) {
     Box(
         modifier = Modifier
             .size(32.dp)
-            .clip(CircleShape)
+            .clip(TodayBadgeShape)
             .background(MaterialTheme.colorScheme.primary)
             .clickable(onClick = onClick)
             .semantics { contentDescription = todayContentDesc },
@@ -409,6 +418,7 @@ private fun MonthGrid(
     onDateSelected: (LocalDate) -> Unit,
 ) {
     val weeks = remember(yearMonth) { buildMonthWeeks(yearMonth) }
+    val today = remember { LocalDate.now() }
 
     Column(Modifier.fillMaxWidth()) {
         WeekdayHeaderRow()
@@ -419,6 +429,7 @@ private fun MonthGrid(
                         day = day,
                         isCurrentMonth = YearMonth.from(day) == yearMonth,
                         isSelected = day == selectedDate,
+                        isToday = day == today,
                         hasEvents = day in daysWithEvents,
                         onDateSelected = onDateSelected,
                         modifier = Modifier.weight(1f),
@@ -458,6 +469,7 @@ private fun DayCell(
     day: LocalDate,
     isCurrentMonth: Boolean,
     isSelected: Boolean,
+    isToday: Boolean,
     hasEvents: Boolean,
     onDateSelected: (LocalDate) -> Unit,
     modifier: Modifier = Modifier,
@@ -465,12 +477,20 @@ private fun DayCell(
     val textColor = when {
         !isCurrentMonth -> MaterialTheme.colorScheme.onSurface.copy(alpha = 0.35f)
         day.dayOfWeek == DayOfWeek.SUNDAY -> MaterialTheme.colorScheme.error
+        isSelected -> MaterialTheme.colorScheme.onPrimaryContainer
         else -> MaterialTheme.colorScheme.onSurface
     }
-    val selectionModifier = if (isSelected) {
-        Modifier.border(1.dp, MaterialTheme.colorScheme.primary, CircleShape)
-    } else {
-        Modifier
+    // The selected day is highlighted opaque only when it's today; selecting any other
+    // day highlights it with the same shape/color but semi-transparent, so "today" stays
+    // visually distinct from an arbitrary selection.
+    val selectionModifier = when {
+        isSelected && isToday -> Modifier
+            .clip(SelectedDayShape)
+            .background(MaterialTheme.colorScheme.primaryContainer)
+        isSelected -> Modifier
+            .clip(SelectedDayShape)
+            .background(MaterialTheme.colorScheme.primaryContainer.copy(alpha = SELECTED_NOT_TODAY_ALPHA))
+        else -> Modifier
     }
     val clickModifier = if (isCurrentMonth) {
         Modifier.clickable { onDateSelected(day) }
@@ -492,8 +512,15 @@ private fun DayCell(
                 Box(
                     modifier = Modifier
                         .padding(top = 2.dp)
-                        .size(4.dp)
-                        .background(MaterialTheme.colorScheme.primary, CircleShape),
+                        .size(5.dp)
+                        .clip(EventDotShape)
+                        .background(
+                            if (isSelected) {
+                                MaterialTheme.colorScheme.onPrimaryContainer
+                            } else {
+                                MaterialTheme.colorScheme.primary
+                            },
+                        ),
                 )
             }
         }
@@ -518,7 +545,10 @@ private fun SelectedDayEvents(
             )
         }
     } else {
-        LazyColumn(modifier = modifier.fillMaxSize()) {
+        LazyColumn(
+            modifier = modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
             items(events, key = { it.id }) { event ->
                 EventRow(
                     event,
@@ -555,25 +585,32 @@ private fun SelectedDayEvents(
 
 @Composable
 private fun EventRow(event: CalendarEvent, onClick: () -> Unit, onDeleteClick: () -> Unit) {
-    Row(
+    Card(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable(onClick = onClick)
-            .padding(vertical = 8.dp),
-        verticalAlignment = Alignment.CenterVertically,
+            .clickable(onClick = onClick),
+        shape = EventCardShape,
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
     ) {
-        Text(
-            text = event.title,
-            style = MaterialTheme.typography.bodyLarge,
-            modifier = Modifier.weight(1f),
-        )
-        Text(
-            text = formatEventTime(event),
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
-        IconButton(onClick = onDeleteClick) {
-            Text("✕", style = MaterialTheme.typography.titleMedium)
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 12.dp, end = 4.dp, top = 4.dp, bottom = 4.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(
+                text = event.title,
+                style = MaterialTheme.typography.bodyLarge,
+                modifier = Modifier.weight(1f),
+            )
+            Text(
+                text = formatEventTime(event),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            IconButton(onClick = onDeleteClick) {
+                Text("✕", style = MaterialTheme.typography.titleMedium)
+            }
         }
     }
 }
@@ -650,6 +687,50 @@ private fun CalendarContentEmptyDayPreview() {
     HomlyTheme {
         CalendarContent(
             uiState = CalendarUiState(),
+            snackbarHostState = remember { SnackbarHostState() },
+            onDateSelected = {},
+            onMonthChanged = {},
+            onTodayClick = {},
+            onDeleteEvent = {},
+            onEventClick = {},
+            onFabClick = {},
+        )
+    }
+}
+
+/** Today is the selected day -> opaque highlight. */
+@Preview(showBackground = true, locale = "uk")
+@Composable
+private fun CalendarContentTodaySelectedPreview() {
+    HomlyTheme {
+        CalendarContent(
+            uiState = CalendarUiState(
+                currentYearMonth = YearMonth.now(),
+                selectedDate = LocalDate.now(),
+            ),
+            snackbarHostState = remember { SnackbarHostState() },
+            onDateSelected = {},
+            onMonthChanged = {},
+            onTodayClick = {},
+            onDeleteEvent = {},
+            onEventClick = {},
+            onFabClick = {},
+        )
+    }
+}
+
+/** A day other than today is selected -> translucent highlight, so "today" stays distinct. */
+@Preview(showBackground = true, locale = "uk")
+@Composable
+private fun CalendarContentOtherDaySelectedPreview() {
+    HomlyTheme {
+        val yearMonth = YearMonth.now()
+        val otherDay = if (LocalDate.now().dayOfMonth == 1) yearMonth.atDay(2) else yearMonth.atDay(1)
+        CalendarContent(
+            uiState = CalendarUiState(
+                currentYearMonth = yearMonth,
+                selectedDate = otherDay,
+            ),
             snackbarHostState = remember { SnackbarHostState() },
             onDateSelected = {},
             onMonthChanged = {},
