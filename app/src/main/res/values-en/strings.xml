@@ -13,7 +13,6 @@
     <string name="login_error">Login can only contain letters and digits</string>
 
     <!-- Home Screen -->
-    <string name="home">Home</string>
     <string name="log_out">Log out</string>
     <string name="log_out_question">Log out?</string>
     <string name="calendar">Calendar</string>
@@ -38,6 +37,7 @@
     <string name="your_todo_list_empty">Your todo list is empty</string>
 
     <!-- Shopping List Screen -->
+    <string name="add_shopping_item">Add item</string>
     <string name="date">Date</string>
     <string name="alphabetical">A–Z</string>
     <string name="your_shopping_list_empty">Your shopping list is empty</string>

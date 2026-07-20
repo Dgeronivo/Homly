@@ -32,9 +32,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.dgero.homly.R
 import com.dgero.homly.todolist.domain.model.TodoItem
 import com.dgero.homly.ui.theme.HomlyTheme
 
@@ -64,7 +66,7 @@ private fun ClassicCardsTodoContent(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Todo list") },
+                title = { Text(stringResource(R.string.todo_list)) },
                 navigationIcon = {
                     IconButton(onClick = {}) {
                         Text("‹", style = MaterialTheme.typography.headlineMedium)
@@ -99,7 +101,7 @@ private fun ClassicCardsTodoContent(
                         contentColor = MutedPurpleOn,
                     ),
                 ) {
-                    Text("Active only")
+                    Text(stringResource(R.string.active_only))
                 }
                 Button(
                     onClick = {},
@@ -112,7 +114,7 @@ private fun ClassicCardsTodoContent(
                         disabledContentColor = MutedPurpleOn,
                     ),
                 ) {
-                    Text("Clear completed")
+                    Text(stringResource(R.string.clear_completed))
                 }
             }
             Row(
@@ -124,7 +126,7 @@ private fun ClassicCardsTodoContent(
                 OutlinedTextField(
                     value = newItemTitle,
                     onValueChange = {},
-                    placeholder = { Text("Add item") },
+                    placeholder = { Text(stringResource(R.string.add_item)) },
                     singleLine = true,
                     shape = MaterialTheme.shapes.medium,
                     colors = OutlinedTextFieldDefaults.colors(
@@ -144,7 +146,7 @@ private fun ClassicCardsTodoContent(
                         contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
                     ),
                 ) {
-                    Text("Add")
+                    Text(stringResource(R.string.add))
                 }
             }
             if (items.isEmpty()) {
@@ -182,7 +184,7 @@ private fun CompactProgressBanner(completedCount: Int, totalCount: Int, modifier
             )
             Spacer(Modifier.width(10.dp))
             Text(
-                text = "Progress: $completedCount of $totalCount done",
+                text = stringResource(R.string.progress, completedCount, totalCount),
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onPrimaryContainer,
             )
@@ -228,7 +230,7 @@ private fun ClassicTodoItemCard(item: TodoItem) {
 @Composable
 private fun ClassicCardsEmptyState() {
     Text(
-        text = "Your todo list is empty",
+        text = stringResource(R.string.your_todo_list_empty),
         style = MaterialTheme.typography.bodyLarge,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
         modifier = Modifier.padding(top = 32.dp),

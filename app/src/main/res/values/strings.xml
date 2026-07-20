@@ -28,7 +28,7 @@
     <string name="cancel">Скасувати</string>
 
     <!-- Todo List Screen -->
-    <string name="active_only">Тільки активні</string>
+    <string name="active_only">Приховати виконані</string>
     <string name="clear_completed">Видалити виконані</string>
     <string name="delete_completed_tasks">Видалити %d виконаних завдань?</string>
     <string name="delete">Видалити</string>
@@ -38,6 +38,7 @@
     <string name="your_todo_list_empty">Ваш список завдань порожній</string>
 
     <!-- Shopping List Screen -->
+    <string name="add_shopping_item">Додати покупку</string>
     <string name="date">За датою</string>
     <string name="alphabetical">За алфавітом</string>
     <string name="your_shopping_list_empty">Ваш список покупок порожній</string>
