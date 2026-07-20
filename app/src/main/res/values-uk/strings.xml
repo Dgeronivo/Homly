@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- App name -->
+    <string name="app_name">Homly</string>
+
+    <!-- Authentication -->
+    <string name="sign_in">Вхід</string>
+    <string name="login">Логін</string>
+    <string name="password">Пароль</string>
+    <string name="create_account">Створити акаунт</string>
+    <string name="register">Реєстрація</string>
+    <string name="login_hint">Тільки англійські букви та цифри, мін. 3 символи</string>
+    <string name="password_hint">Мін. 4 символи: букви, цифри та спец. символи</string>
+    <string name="login_error">Логін може містити тільки букви та цифри</string>
+
+    <!-- Home Screen -->
+    <string name="home">Домашня</string>
+    <string name="log_out">Вийти</string>
+    <string name="log_out_question">Вийти з системи?</string>
+    <string name="calendar">Календар</string>
+    <string name="today_events">Сьогодні: %d подій</string>
+    <string name="no_events_today">Немає подій сьогодні</string>
+    <string name="shopping_list">Список покупок</string>
+    <string name="shopping_left">%d залишилось</string>
+    <string name="todo_list">Список завдань</string>
+    <string name="todo_pending">%d в очікуванні</string>
+    <string name="all_done">Всі виконані</string>
+    <string name="empty">Порожньо</string>
+    <string name="cancel">Скасувати</string>
+
+    <!-- Todo List Screen -->
+    <string name="active_only">Тільки активні</string>
+    <string name="clear_completed">Видалити виконані</string>
+    <string name="delete_completed_tasks">Видалити %d виконаних завдань?</string>
+    <string name="delete">Видалити</string>
+    <string name="add_item">Додати завдання</string>
+    <string name="todo_list_full">Список переповнений (макс. %d завдань)</string>
+    <string name="add">Додати</string>
+    <string name="your_todo_list_empty">Ваш список завдань порожній</string>
+
+    <!-- Shopping List Screen -->
+    <string name="date">За датою</string>
+    <string name="alphabetical">За алфавітом</string>
+    <string name="your_shopping_list_empty">Ваш список покупок порожній</string>
+    <string name="shopping_list_full">Список переповнений (макс. %d товарів)</string>
+
+    <!-- Calendar Screen -->
+    <string name="select_month_year">Виберіть місяць і рік</string>
+    <string name="add_event">Додати подію</string>
+    <string name="delete_this_event">Видалити цю подію?</string>
+    <string name="all_day">Цілий день</string>
+    <string name="no_events_day">Немає подій на цей день</string>
+    <string name="event_limit_reached">Досягнуто ліміту подій (макс. %d)</string>
+    <string name="mon">Пн</string>
+    <string name="tue">Вт</string>
+    <string name="wed">Ср</string>
+    <string name="thu">Чт</string>
+    <string name="fri">Пт</string>
+    <string name="sat">Сб</string>
+    <string name="sun">Нд</string>
+
+    <!-- Add/Edit Event Screen -->
+    <string name="edit_event">Редагувати подію</string>
+    <string name="title">Назва</string>
+    <string name="date_label">Дата: %s</string>
+    <string name="start_time">Початок: %s</string>
+    <string name="end_time">Кінець: %s</string>
+    <string name="save">Зберегти</string>
+    <string name="ok">Гаразд</string>
+    <string name="time_error">Час завершення має бути пізніше часу початку</string>
+
+    <!-- Design Variations -->
+    <string name="in_cart">Куплено</string>
+    <string name="bought_count">%d з %d куплено</string>
+    <string name="clear_bought">Видалити куплене</string>
+    <string name="to_buy">Потрібно купити</string>
+    <string name="bought">Куплено</string>
+    <string name="clear">Очистити</string>
+    <string name="progress">Прогрес: %d з %d виконано</string>
+
+    <!-- Accessibility -->
+    <string name="pick_month_year">Вибрати місяць та рік</string>
+    <string name="today_button">Сьогодні</string>
+</resources>

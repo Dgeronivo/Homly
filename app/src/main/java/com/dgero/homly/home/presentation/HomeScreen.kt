@@ -29,12 +29,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.dgero.homly.R
 import com.dgero.homly.ui.theme.HomlyGridCard
 import com.dgero.homly.ui.theme.HomlyHeroCard
 import com.dgero.homly.ui.theme.HomlyTheme
@@ -94,10 +96,10 @@ private fun HomeContent(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Home") },
+                title = { Text(stringResource(R.string.home)) },
                 actions = {
                     IconButton(onClick = { showLogoutConfirm = true }) {
-                        Icon(Icons.Default.ExitToApp, contentDescription = "Log out")
+                        Icon(Icons.Default.ExitToApp, contentDescription = stringResource(R.string.log_out))
                     }
                 },
             )
@@ -111,8 +113,8 @@ private fun HomeContent(
         ) {
             HomlyHeroCard(
                 icon = Icons.Default.DateRange,
-                title = "Calendar",
-                summary = if (todayEventsCount > 0) "Today: $todayEventsCount events" else "No events today",
+                title = stringResource(R.string.calendar),
+                summary = if (todayEventsCount > 0) stringResource(R.string.today_events, todayEventsCount) else stringResource(R.string.no_events_today),
                 onClick = onOpenCalendar,
             )
             Spacer(Modifier.height(12.dp))
@@ -122,18 +124,18 @@ private fun HomeContent(
             ) {
                 HomlyGridCard(
                     icon = Icons.Default.ShoppingCart,
-                    title = "Shopping list",
-                    summary = if (shoppingActiveCount > 0) "$shoppingActiveCount left" else "Empty",
+                    title = stringResource(R.string.shopping_list),
+                    summary = if (shoppingActiveCount > 0) stringResource(R.string.shopping_left, shoppingActiveCount) else stringResource(R.string.empty),
                     onClick = onOpenShoppingList,
                     modifier = Modifier.weight(1f),
                 )
                 HomlyGridCard(
                     icon = Icons.Default.CheckCircle,
-                    title = "Todo list",
+                    title = stringResource(R.string.todo_list),
                     summary = when {
-                        todoPendingCount > 0 -> "$todoPendingCount pending"
-                        todoTotalCount > 0 -> "All done"
-                        else -> "Empty"
+                        todoPendingCount > 0 -> stringResource(R.string.todo_pending, todoPendingCount)
+                        todoTotalCount > 0 -> stringResource(R.string.all_done)
+                        else -> stringResource(R.string.empty)
                     },
                     onClick = onOpenTodoList,
                     modifier = Modifier.weight(1f),
@@ -145,7 +147,7 @@ private fun HomeContent(
     if (showLogoutConfirm) {
         AlertDialog(
             onDismissRequest = { showLogoutConfirm = false },
-            title = { Text("Log out?") },
+            title = { Text(stringResource(R.string.log_out_question)) },
             confirmButton = {
                 TextButton(
                     onClick = {
@@ -153,12 +155,12 @@ private fun HomeContent(
                         onLogout()
                     },
                 ) {
-                    Text("Log out")
+                    Text(stringResource(R.string.log_out))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showLogoutConfirm = false }) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.cancel))
                 }
             },
         )

@@ -24,12 +24,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.dgero.homly.R
 import com.dgero.homly.ui.theme.HomlyTheme
 
 @Composable
@@ -75,16 +77,16 @@ private fun RegisterContent(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {
-        Text(text = "Create Account", style = MaterialTheme.typography.headlineMedium)
+        Text(text = stringResource(R.string.create_account), style = MaterialTheme.typography.headlineMedium)
         Spacer(Modifier.height(24.dp))
         OutlinedTextField(
             value = uiState.login,
             onValueChange = onLoginChange,
-            label = { Text("Login") },
+            label = { Text(stringResource(R.string.login)) },
             singleLine = true,
             isError = uiState.loginError != null,
             supportingText = {
-                Text(uiState.loginError ?: "Only English letters and digits, min 3 characters")
+                Text(uiState.loginError ?: stringResource(R.string.login_hint))
             },
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
             modifier = Modifier.fillMaxWidth(),
@@ -94,11 +96,11 @@ private fun RegisterContent(
         OutlinedTextField(
             value = uiState.password,
             onValueChange = onPasswordChange,
-            label = { Text("Password") },
+            label = { Text(stringResource(R.string.password)) },
             singleLine = true,
             isError = uiState.passwordError != null,
             supportingText = {
-                Text(uiState.passwordError ?: "Min 4 characters, letters, digits and special characters")
+                Text(uiState.passwordError ?: stringResource(R.string.password_hint))
             },
             visualTransformation = if (isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
             trailingIcon = {
@@ -128,11 +130,11 @@ private fun RegisterContent(
                 enabled = isFormValid,
                 modifier = Modifier.fillMaxWidth(),
             ) {
-                Text("Register")
+                Text(stringResource(R.string.register))
             }
             Spacer(Modifier.height(8.dp))
             TextButton(onClick = onLoginClick, modifier = Modifier.fillMaxWidth()) {
-                Text("Login")
+                Text(stringResource(R.string.login))
             }
         }
     }
@@ -159,7 +161,7 @@ private fun RegisterContentWithErrorPreview() {
         RegisterContent(
             uiState = RegisterUiState(
                 login = "кирилиця",
-                loginError = "Login can only contain letters and digits",
+                loginError = stringResource(R.string.login_error),
             ),
             onLoginChange = {},
             onPasswordChange = {},

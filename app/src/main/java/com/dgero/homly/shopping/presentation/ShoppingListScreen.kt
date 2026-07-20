@@ -31,11 +31,13 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.dgero.homly.R
 import com.dgero.homly.shopping.domain.model.ShoppingItem
 import com.dgero.homly.shopping.domain.model.ShoppingLimits
 import com.dgero.homly.shopping.domain.model.ShoppingSortOrder
@@ -75,7 +77,7 @@ private fun ShoppingListContent(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Shopping list") },
+                title = { Text(stringResource(R.string.shopping_list)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Text("‹", style = MaterialTheme.typography.headlineMedium)
@@ -136,7 +138,7 @@ private fun AddItemRow(
         OutlinedTextField(
             value = text,
             onValueChange = onTextChange,
-            label = { Text("Add item") },
+            label = { Text(stringResource(R.string.add_item)) },
             singleLine = true,
             enabled = !isLimitReached,
             isError = errorMessage != null,
@@ -144,7 +146,7 @@ private fun AddItemRow(
             keyboardActions = KeyboardActions(onDone = { if (canAdd) onAdd() }),
             supportingText = {
                 when {
-                    isLimitReached -> Text("List is full (max ${ShoppingLimits.MAX_ITEMS} items)")
+                    isLimitReached -> Text(stringResource(R.string.shopping_list_full, ShoppingLimits.MAX_ITEMS))
                     errorMessage != null -> Text(errorMessage)
                 }
             },
@@ -156,7 +158,7 @@ private fun AddItemRow(
             enabled = canAdd,
             modifier = Modifier.padding(top = 8.dp),
         ) {
-            Text("Add")
+            Text(stringResource(R.string.add))
         }
     }
 }
@@ -176,12 +178,12 @@ private fun SortSelector(
         FilterChip(
             selected = sortOrder == ShoppingSortOrder.DATE_DESC,
             onClick = { onSortChange(ShoppingSortOrder.DATE_DESC) },
-            label = { Text("Date") },
+            label = { Text(stringResource(R.string.date)) },
         )
         FilterChip(
             selected = sortOrder == ShoppingSortOrder.ALPHABETICAL,
             onClick = { onSortChange(ShoppingSortOrder.ALPHABETICAL) },
-            label = { Text("A–Z") },
+            label = { Text(stringResource(R.string.alphabetical)) },
         )
     }
 }
@@ -246,7 +248,7 @@ private fun EmptyState() {
         contentAlignment = Alignment.Center,
     ) {
         Text(
-            text = "Your shopping list is empty",
+            text = stringResource(R.string.your_shopping_list_empty),
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )

@@ -52,9 +52,11 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
+import com.dgero.homly.R
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -72,7 +74,6 @@ import kotlinx.coroutines.flow.drop
 
 private val MONTH_HEADER_FORMATTER = DateTimeFormatter.ofPattern("MMMM yyyy")
 private val TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm")
-private val WEEKDAY_LABELS = listOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
 private const val GRID_WEEKS = 6
 internal const val MONTH_PAGER_TEST_TAG = "monthPager"
 
@@ -95,9 +96,10 @@ fun CalendarScreen(
     LaunchedEffect(Unit) {
         viewModel.navigateToAddEvent.collect { onAddEvent(uiState.selectedDate) }
     }
+    val eventLimitMessage = stringResource(R.string.event_limit_reached, CalendarLimits.MAX_EVENTS)
     LaunchedEffect(Unit) {
         viewModel.eventLimitReached.collect {
-            snackbarHostState.showSnackbar("Event limit reached (max ${CalendarLimits.MAX_EVENTS} events)")
+            snackbarHostState.showSnackbar(eventLimitMessage)
         }
     }
 
@@ -167,7 +169,7 @@ internal fun CalendarContent(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         floatingActionButton = {
             FloatingActionButton(onClick = onFabClick) {
-                Icon(Icons.Default.Add, contentDescription = "Add event")
+                Icon(Icons.Default.Add, contentDescription = stringResource(R.string.add_event))
             }
         },
     ) { innerPadding ->
@@ -237,7 +239,7 @@ private fun MonthHeader(yearMonth: YearMonth, onPickerClick: () -> Unit, onToday
         Row(verticalAlignment = Alignment.CenterVertically) {
             TodayButton(onClick = onTodayClick)
             IconButton(onClick = onPickerClick) {
-                Icon(Icons.Default.DateRange, contentDescription = "Pick month and year")
+                Icon(Icons.Default.DateRange, contentDescription = stringResource(R.string.pick_month_year))
             }
         }
     }
@@ -246,13 +248,14 @@ private fun MonthHeader(yearMonth: YearMonth, onPickerClick: () -> Unit, onToday
 /** Circular "jump to today" shortcut showing today's day-of-month number, like a mini date badge. */
 @Composable
 private fun TodayButton(onClick: () -> Unit) {
+    val todayContentDesc = stringResource(R.string.today_button)
     Box(
         modifier = Modifier
             .size(32.dp)
             .clip(CircleShape)
             .background(MaterialTheme.colorScheme.primary)
             .clickable(onClick = onClick)
-            .semantics { contentDescription = "Сьогодні" },
+            .semantics { contentDescription = todayContentDesc },
         contentAlignment = Alignment.Center,
     ) {
         Text(
@@ -298,7 +301,7 @@ private fun MonthYearPickerDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Select month & year") },
+        title = { Text(stringResource(R.string.select_month_year)) },
         text = {
             Column {
                 YearStepper(
@@ -314,12 +317,12 @@ private fun MonthYearPickerDialog(
         },
         confirmButton = {
             TextButton(onClick = { onConfirm(YearMonth.of(selectedYear, selectedMonth)) }) {
-                Text("OK")
+                Text(stringResource(R.string.ok))
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Cancel")
+                Text(stringResource(R.string.cancel))
             }
         },
     )
@@ -428,8 +431,17 @@ private fun MonthGrid(
 
 @Composable
 private fun WeekdayHeaderRow() {
+    val weekdayLabels = listOf(
+        stringResource(R.string.mon),
+        stringResource(R.string.tue),
+        stringResource(R.string.wed),
+        stringResource(R.string.thu),
+        stringResource(R.string.fri),
+        stringResource(R.string.sat),
+        stringResource(R.string.sun),
+    )
     Row(Modifier.fillMaxWidth()) {
-        WEEKDAY_LABELS.forEach { label ->
+        weekdayLabels.forEach { label ->
             Text(
                 text = label,
                 modifier = Modifier.weight(1f),
@@ -500,7 +512,7 @@ private fun SelectedDayEvents(
     if (events.isEmpty()) {
         Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             Text(
-                text = "No events for this day",
+                text = stringResource(R.string.no_events_day),
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -521,7 +533,7 @@ private fun SelectedDayEvents(
     if (eventPendingDeletion != null) {
         AlertDialog(
             onDismissRequest = { pendingDeleteEvent = null },
-            title = { Text("Delete this event?") },
+            title = { Text(stringResource(R.string.delete_this_event)) },
             confirmButton = {
                 TextButton(
                     onClick = {
@@ -529,12 +541,12 @@ private fun SelectedDayEvents(
                         pendingDeleteEvent = null
                     },
                 ) {
-                    Text("Delete")
+                    Text(stringResource(R.string.delete))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { pendingDeleteEvent = null }) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.cancel))
                 }
             },
         )
@@ -567,10 +579,11 @@ private fun EventRow(event: CalendarEvent, onClick: () -> Unit, onDeleteClick: (
 }
 
 private fun formatEventTime(event: CalendarEvent): String {
-    if (event.isAllDay) return "All day"
+    // Note: This function is called outside Composable context, so we can't use stringResource here
+    // "All day" will be handled in the UI layer instead
     val start = event.startTime?.format(TIME_FORMATTER) ?: "--:--"
     val end = event.endTime?.format(TIME_FORMATTER) ?: "--:--"
-    return "$start–$end"
+    return if (event.isAllDay) "All day" else "$start–$end"
 }
 
 /** Builds [GRID_WEEKS] weeks (Monday-first) covering [yearMonth], including adjacent-month fill days. */

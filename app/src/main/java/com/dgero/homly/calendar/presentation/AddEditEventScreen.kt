@@ -33,9 +33,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.dgero.homly.R
 import com.dgero.homly.ui.theme.HomlyTheme
 import java.time.Instant
 import java.time.LocalDate
@@ -94,7 +96,7 @@ private fun AddEditEventContent(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(if (uiState.isEditMode) "Edit event" else "Add event") },
+                title = { Text(if (uiState.isEditMode) stringResource(R.string.edit_event) else stringResource(R.string.add_event)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Text("‹", style = MaterialTheme.typography.headlineMedium)
@@ -112,7 +114,7 @@ private fun AddEditEventContent(
             OutlinedTextField(
                 value = uiState.title,
                 onValueChange = onTitleChange,
-                label = { Text("Title") },
+                label = { Text(stringResource(R.string.title)) },
                 isError = uiState.titleError != null,
                 supportingText = { uiState.titleError?.let { Text(it) } },
                 modifier = Modifier.fillMaxWidth(),
@@ -120,7 +122,7 @@ private fun AddEditEventContent(
             Spacer(Modifier.height(8.dp))
 
             OutlinedButton(onClick = { showDatePicker = true }, modifier = Modifier.fillMaxWidth()) {
-                Text("Date: ${uiState.date.format(DATE_FORMATTER)}")
+                Text(stringResource(R.string.date_label, uiState.date.format(DATE_FORMATTER)))
             }
             Spacer(Modifier.height(8.dp))
 
@@ -129,22 +131,22 @@ private fun AddEditEventContent(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                Text("All day", style = MaterialTheme.typography.bodyLarge)
+                Text(stringResource(R.string.all_day), style = MaterialTheme.typography.bodyLarge)
                 Switch(checked = uiState.isAllDay, onCheckedChange = onAllDayToggle)
             }
 
             if (!uiState.isAllDay) {
                 Spacer(Modifier.height(8.dp))
                 OutlinedButton(onClick = { showStartTimePicker = true }, modifier = Modifier.fillMaxWidth()) {
-                    Text("Start: ${uiState.startTime?.format(TIME_FORMATTER) ?: "--:--"}")
+                    Text(stringResource(R.string.start_time, uiState.startTime?.format(TIME_FORMATTER) ?: "--:--"))
                 }
                 Spacer(Modifier.height(8.dp))
                 OutlinedButton(onClick = { showEndTimePicker = true }, modifier = Modifier.fillMaxWidth()) {
-                    Text("End: ${uiState.endTime?.format(TIME_FORMATTER) ?: "--:--"}")
+                    Text(stringResource(R.string.end_time, uiState.endTime?.format(TIME_FORMATTER) ?: "--:--"))
                 }
                 if (uiState.timeError != null) {
                     Text(
-                        text = uiState.timeError,
+                        text = uiState.timeError ?: stringResource(R.string.time_error),
                         color = MaterialTheme.colorScheme.error,
                         style = MaterialTheme.typography.bodySmall,
                         modifier = Modifier.padding(top = 4.dp),
@@ -163,7 +165,7 @@ private fun AddEditEventContent(
                 enabled = !uiState.isSaving,
                 modifier = Modifier.fillMaxWidth(),
             ) {
-                Text("Save")
+                Text(stringResource(R.string.save))
             }
         }
     }
@@ -216,11 +218,11 @@ private fun EventDatePickerDialog(
                 val millis = state.selectedDateMillis
                 if (millis != null) onConfirm(millis.toLocalDateUtc()) else onDismiss()
             }) {
-                Text("OK")
+                Text(stringResource(R.string.ok))
             }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) { Text("Cancel") }
+            TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel)) }
         },
     ) {
         DatePicker(state = state)
@@ -244,11 +246,11 @@ private fun EventTimePickerDialog(
         onDismissRequest = onDismiss,
         confirmButton = {
             TextButton(onClick = { onConfirm(LocalTime.of(state.hour, state.minute)) }) {
-                Text("OK")
+                Text(stringResource(R.string.ok))
             }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) { Text("Cancel") }
+            TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel)) }
         },
         text = { TimePicker(state = state) },
     )
@@ -285,7 +287,7 @@ private fun AddEditEventContentValidationErrorPreview() {
                 isEditMode = true,
                 startTime = LocalTime.of(10, 0),
                 endTime = LocalTime.of(10, 0),
-                timeError = "End time must be after start time",
+                timeError = stringResource(R.string.time_error),
             ),
             onBack = {},
             onTitleChange = {},

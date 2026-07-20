@@ -34,11 +34,13 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.dgero.homly.R
 import com.dgero.homly.todolist.domain.model.TodoItem
 import com.dgero.homly.todolist.domain.model.TodoLimits
 import com.dgero.homly.ui.theme.HomlyTheme
@@ -81,7 +83,7 @@ private fun TodoListContent(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Todo list") },
+                title = { Text(stringResource(R.string.todo_list)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Text("‹", style = MaterialTheme.typography.headlineMedium)
@@ -155,13 +157,13 @@ private fun TodoListControls(
         FilterChip(
             selected = showActiveOnly,
             onClick = onToggleActiveOnly,
-            label = { Text("Active only") },
+            label = { Text(stringResource(R.string.active_only)) },
         )
         Button(
             onClick = onClearCompletedClick,
             enabled = isClearEnabled,
         ) {
-            Text("Clear completed")
+            Text(stringResource(R.string.clear_completed))
         }
     }
 }
@@ -187,12 +189,12 @@ private fun ClearCompletedConfirmDialog(
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Delete $completedCount completed tasks?") },
+        title = { Text(stringResource(R.string.delete_completed_tasks, completedCount)) },
         confirmButton = {
-            TextButton(onClick = onConfirm) { Text("Delete") }
+            TextButton(onClick = onConfirm) { Text(stringResource(R.string.delete)) }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) { Text("Cancel") }
+            TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel)) }
         },
     )
 }
@@ -228,7 +230,7 @@ private fun AddItemRow(
         OutlinedTextField(
             value = title,
             onValueChange = onTitleChange,
-            label = { Text("Add item") },
+            label = { Text(stringResource(R.string.add_item)) },
             singleLine = true,
             enabled = !isLimitReached,
             isError = errorMessage != null,
@@ -236,7 +238,7 @@ private fun AddItemRow(
             keyboardActions = KeyboardActions(onDone = { if (canAdd) onAdd() }),
             supportingText = {
                 when {
-                    isLimitReached -> Text("List is full (max ${TodoLimits.MAX_ITEMS} items)")
+                    isLimitReached -> Text(stringResource(R.string.todo_list_full, TodoLimits.MAX_ITEMS))
                     errorMessage != null -> Text(errorMessage)
                 }
             },
@@ -248,7 +250,7 @@ private fun AddItemRow(
             enabled = canAdd,
             modifier = Modifier.padding(top = 8.dp),
         ) {
-            Text("Add")
+            Text(stringResource(R.string.add))
         }
     }
 }
@@ -313,7 +315,7 @@ private fun EmptyState() {
         contentAlignment = Alignment.Center,
     ) {
         Text(
-            text = "Your todo list is empty",
+            text = stringResource(R.string.your_todo_list_empty),
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
