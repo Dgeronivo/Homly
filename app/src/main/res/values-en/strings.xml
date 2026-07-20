@@ -38,6 +38,7 @@
 
     <!-- Shopping List Screen -->
     <string name="add_shopping_item">Add item</string>
+    <string name="sort_label">Sort by:</string>
     <string name="date">Date</string>
     <string name="alphabetical">A–Z</string>
     <string name="your_shopping_list_empty">Your shopping list is empty</string>

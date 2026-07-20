@@ -31,9 +31,11 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.dgero.homly.R
 import com.dgero.homly.shopping.domain.model.ShoppingItem
 import com.dgero.homly.shopping.domain.model.ShoppingSortOrder
 import com.dgero.homly.ui.theme.HomlyTheme
@@ -55,7 +57,7 @@ private fun ClassicCardsShoppingContent(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Shopping list") },
+                title = { Text(stringResource(R.string.shopping_list)) },
                 navigationIcon = {
                     IconButton(onClick = {}) {
                         Text("‹", style = MaterialTheme.typography.headlineMedium)
@@ -82,15 +84,16 @@ private fun ClassicCardsShoppingContent(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
+                Text(stringResource(R.string.sort_label), style = MaterialTheme.typography.bodyMedium)
                 FilterChip(
                     selected = sortOrder == ShoppingSortOrder.DATE_DESC,
                     onClick = {},
-                    label = { Text("Date") },
+                    label = { Text(stringResource(R.string.date)) },
                 )
                 FilterChip(
                     selected = sortOrder == ShoppingSortOrder.ALPHABETICAL,
                     onClick = {},
-                    label = { Text("A–Z") },
+                    label = { Text(stringResource(R.string.alphabetical)) },
                 )
             }
             Row(
@@ -102,7 +105,7 @@ private fun ClassicCardsShoppingContent(
                 OutlinedTextField(
                     value = newItemText,
                     onValueChange = {},
-                    placeholder = { Text("Add item") },
+                    placeholder = { Text(stringResource(R.string.add_shopping_item)) },
                     singleLine = true,
                     shape = MaterialTheme.shapes.medium,
                     colors = OutlinedTextFieldDefaults.colors(
@@ -122,7 +125,7 @@ private fun ClassicCardsShoppingContent(
                         contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
                     ),
                 ) {
-                    Text("Add")
+                    Text(stringResource(R.string.add))
                 }
             }
             if (items.isEmpty()) {
@@ -160,7 +163,7 @@ private fun CompactProgressBanner(boughtCount: Int, totalCount: Int, modifier: M
             )
             Spacer(Modifier.width(10.dp))
             Text(
-                text = "In cart: $boughtCount of $totalCount",
+                text = stringResource(R.string.bought_count, boughtCount, totalCount),
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onPrimaryContainer,
             )
@@ -206,7 +209,7 @@ private fun ClassicShoppingItemCard(item: ShoppingItem) {
 @Composable
 private fun ClassicCardsEmptyState() {
     Text(
-        text = "Your shopping list is empty",
+        text = stringResource(R.string.your_shopping_list_empty),
         style = MaterialTheme.typography.bodyLarge,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
         modifier = Modifier.padding(top = 32.dp),
