@@ -14,15 +14,14 @@
     <string name="login_error">Логін може містити тільки букви та цифри</string>
 
     <!-- Home Screen -->
-    <string name="home">Домашня</string>
     <string name="log_out">Вийти</string>
     <string name="log_out_question">Вийти з системи?</string>
     <string name="calendar">Календар</string>
     <string name="today_events">Сьогодні: %d подій</string>
     <string name="no_events_today">Немає подій сьогодні</string>
-    <string name="shopping_list">Список покупок</string>
+    <string name="shopping_list">Покупки</string>
     <string name="shopping_left">%d залишилось</string>
-    <string name="todo_list">Список завдань</string>
+    <string name="todo_list">Справи</string>
     <string name="todo_pending">%d в очікуванні</string>
     <string name="all_done">Всі виконані</string>
     <string name="empty">Порожньо</string>

@@ -29,6 +29,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalLocale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -40,6 +41,8 @@ import com.dgero.homly.R
 import com.dgero.homly.ui.theme.HomlyGridCard
 import com.dgero.homly.ui.theme.HomlyHeroCard
 import com.dgero.homly.ui.theme.HomlyTheme
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 @Composable
 fun HomeScreen(
@@ -93,10 +96,16 @@ private fun HomeContent(
 ) {
     var showLogoutConfirm by remember { mutableStateOf(false) }
 
+    val locale = LocalLocale.current.platformLocale
+    val todayLabel = remember(locale) {
+        val formatter = DateTimeFormatter.ofPattern("EEEE, d MMMM", locale)
+        LocalDate.now().format(formatter).replaceFirstChar { it.titlecase(locale) }
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(stringResource(R.string.home)) },
+                title = { Text(todayLabel) },
                 actions = {
                     IconButton(onClick = { showLogoutConfirm = true }) {
                         Icon(Icons.Default.ExitToApp, contentDescription = stringResource(R.string.log_out))
