@@ -1,4 +1,4 @@
-.PHONY: build test connected-test clean rebuild
+.PHONY: build test connected-test clean rebuild stop
 
 build:
 	gradlew build
@@ -13,3 +13,6 @@ clean:
 	gradlew clean
 
 rebuild: clean build
+
+stop:
+	gradlew --stop

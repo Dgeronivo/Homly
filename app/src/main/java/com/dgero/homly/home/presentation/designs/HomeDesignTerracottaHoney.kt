@@ -191,7 +191,7 @@ private fun TerracottaGridCard(icon: ImageVector, title: String, summary: String
     }
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, locale = "uk")
 @Composable
 private fun TerracottaHoneyHomePreview() {
     TerracottaHoneyTheme {
@@ -204,7 +204,7 @@ private fun TerracottaHoneyHomePreview() {
     }
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, locale = "uk")
 @Composable
 private fun TerracottaHoneyHomeEmptyPreview() {
     TerracottaHoneyTheme {

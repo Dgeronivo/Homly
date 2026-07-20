@@ -13,13 +13,19 @@ import com.dgero.homly.auth.domain.repository.UserRepository
 import com.dgero.homly.calendar.data.repository.LocalCalendarEventRepository
 import com.dgero.homly.calendar.domain.repository.CalendarEventRepository
 import com.dgero.homly.core.data.HomlyDatabase
+import com.dgero.homly.core.locale.withForcedLocale
 import com.dgero.homly.shopping.data.repository.LocalShoppingRepository
 import com.dgero.homly.shopping.domain.repository.ShoppingRepository
 import com.dgero.homly.todolist.data.repository.LocalTodoRepository
 import com.dgero.homly.todolist.domain.repository.TodoRepository
+import java.util.Locale
 
 class HomlyApplication : Application() {
     val container: AppContainer by lazy { AppContainer(this) }
+
+    override fun attachBaseContext(base: Context) {
+        super.attachBaseContext(base.withForcedLocale(Locale.forLanguageTag("uk")))
+    }
 }
 
 class AppContainer(context: Context) {

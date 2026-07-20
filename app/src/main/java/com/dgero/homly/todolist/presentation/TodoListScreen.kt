@@ -168,7 +168,7 @@ private fun TodoListControls(
     }
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, locale = "uk")
 @Composable
 private fun TodoListControlsPreview() {
     HomlyTheme {
@@ -199,7 +199,7 @@ private fun ClearCompletedConfirmDialog(
     )
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, locale = "uk")
 @Composable
 private fun ClearCompletedConfirmDialogPreview() {
     HomlyTheme {
@@ -322,7 +322,7 @@ private fun EmptyState() {
     }
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, locale = "uk")
 @Composable
 private fun TodoListContentPreview() {
     HomlyTheme {
@@ -346,7 +346,7 @@ private fun TodoListContentPreview() {
     }
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, locale = "uk")
 @Composable
 private fun TodoListEmptyPreview() {
     HomlyTheme {

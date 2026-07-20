@@ -213,7 +213,7 @@ private fun ClassicCardsEmptyState() {
     )
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, locale = "uk")
 @Composable
 private fun ClassicCardsShoppingPreview() {
     HomlyTheme {
@@ -230,7 +230,7 @@ private fun ClassicCardsShoppingPreview() {
     }
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, locale = "uk")
 @Composable
 private fun ClassicCardsShoppingEmptyPreview() {
     HomlyTheme {

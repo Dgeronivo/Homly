@@ -1,0 +1,83 @@
+<resources>
+    <!-- App name -->
+    <string name="app_name">Homly</string>
+
+    <!-- Authentication -->
+    <string name="sign_in">Sign In</string>
+    <string name="login">Login</string>
+    <string name="password">Password</string>
+    <string name="create_account">Create Account</string>
+    <string name="register">Register</string>
+    <string name="login_hint">Only English letters and digits, min 3 characters</string>
+    <string name="password_hint">Min 4 characters, letters, digits and special characters</string>
+    <string name="login_error">Login can only contain letters and digits</string>
+
+    <!-- Home Screen -->
+    <string name="home">Home</string>
+    <string name="log_out">Log out</string>
+    <string name="log_out_question">Log out?</string>
+    <string name="calendar">Calendar</string>
+    <string name="today_events">Today: %d events</string>
+    <string name="no_events_today">No events today</string>
+    <string name="shopping_list">Shopping list</string>
+    <string name="shopping_left">%d left</string>
+    <string name="todo_list">Todo list</string>
+    <string name="todo_pending">%d pending</string>
+    <string name="all_done">All done</string>
+    <string name="empty">Empty</string>
+    <string name="cancel">Cancel</string>
+
+    <!-- Todo List Screen -->
+    <string name="active_only">Active only</string>
+    <string name="clear_completed">Clear completed</string>
+    <string name="delete_completed_tasks">Delete %d completed tasks?</string>
+    <string name="delete">Delete</string>
+    <string name="add_item">Add item</string>
+    <string name="todo_list_full">List is full (max %d items)</string>
+    <string name="add">Add</string>
+    <string name="your_todo_list_empty">Your todo list is empty</string>
+
+    <!-- Shopping List Screen -->
+    <string name="date">Date</string>
+    <string name="alphabetical">A–Z</string>
+    <string name="your_shopping_list_empty">Your shopping list is empty</string>
+    <string name="shopping_list_full">List is full (max %d items)</string>
+
+    <!-- Calendar Screen -->
+    <string name="select_month_year">Select month &amp;year</string>
+    <string name="add_event">Add event</string>
+    <string name="delete_this_event">Delete this event?</string>
+    <string name="all_day">All day</string>
+    <string name="no_events_day">No events for this day</string>
+    <string name="event_limit_reached">Event limit reached (max %d events)</string>
+    <string name="mon">Mon</string>
+    <string name="tue">Tue</string>
+    <string name="wed">Wed</string>
+    <string name="thu">Thu</string>
+    <string name="fri">Fri</string>
+    <string name="sat">Sat</string>
+    <string name="sun">Sun</string>
+
+    <!-- Add/Edit Event Screen -->
+    <string name="edit_event">Edit event</string>
+    <string name="title">Title</string>
+    <string name="date_label">Date: %s</string>
+    <string name="start_time">Start: %s</string>
+    <string name="end_time">End: %s</string>
+    <string name="save">Save</string>
+    <string name="ok">OK</string>
+    <string name="time_error">End time must be after start time</string>
+
+    <!-- Design Variations -->
+    <string name="in_cart">In cart</string>
+    <string name="bought_count">%d of %d bought</string>
+    <string name="clear_bought">Clear bought</string>
+    <string name="to_buy">To buy</string>
+    <string name="bought">Bought</string>
+    <string name="clear">Clear</string>
+    <string name="progress">Progress: %d of %d done</string>
+
+    <!-- Accessibility -->
+    <string name="pick_month_year">Pick month and year</string>
+    <string name="today_button">Сьогодні</string>
+</resources>

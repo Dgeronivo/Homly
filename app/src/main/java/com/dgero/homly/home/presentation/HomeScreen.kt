@@ -167,7 +167,7 @@ private fun HomeContent(
     }
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, locale = "uk")
 @Composable
 private fun HomeContentPreview() {
     HomlyTheme {
@@ -184,7 +184,7 @@ private fun HomeContentPreview() {
     }
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, locale = "uk")
 @Composable
 private fun HomeContentAllDonePreview() {
     HomlyTheme {
@@ -201,7 +201,7 @@ private fun HomeContentAllDonePreview() {
     }
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, locale = "uk")
 @Composable
 private fun HomeContentEmptyPreview() {
     HomlyTheme {

@@ -1,5 +1,6 @@
 package com.dgero.homly
 
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -31,6 +32,7 @@ import com.dgero.homly.calendar.presentation.AddEditEventScreen
 import com.dgero.homly.calendar.presentation.AddEditEventViewModel
 import com.dgero.homly.calendar.presentation.CalendarScreen
 import com.dgero.homly.calendar.presentation.CalendarViewModel
+import com.dgero.homly.core.locale.withForcedLocale
 import com.dgero.homly.home.presentation.HomeScreen
 import com.dgero.homly.home.presentation.HomeViewModel
 import com.dgero.homly.shopping.domain.usecase.AddShoppingItemUseCase
@@ -54,9 +56,14 @@ import com.dgero.homly.todolist.presentation.TodoListScreen
 import com.dgero.homly.todolist.presentation.TodoListViewModel
 import com.dgero.homly.ui.theme.HomlyTheme
 import java.time.LocalDate
+import java.util.Locale
 import kotlinx.coroutines.flow.first
 
 class MainActivity : ComponentActivity() {
+    override fun attachBaseContext(newBase: Context) {
+        super.attachBaseContext(newBase.withForcedLocale(Locale.forLanguageTag("uk")))
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()

@@ -140,7 +140,7 @@ private fun RegisterContent(
     }
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, locale = "uk")
 @Composable
 private fun RegisterContentPreview() {
     HomlyTheme {
@@ -154,7 +154,7 @@ private fun RegisterContentPreview() {
     }
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, locale = "uk")
 @Composable
 private fun RegisterContentWithErrorPreview() {
     HomlyTheme {

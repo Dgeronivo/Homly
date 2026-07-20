@@ -255,7 +255,7 @@ private fun EmptyState() {
     }
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, locale = "uk")
 @Composable
 private fun ShoppingListContentPreview() {
     HomlyTheme {
@@ -277,7 +277,7 @@ private fun ShoppingListContentPreview() {
     }
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, locale = "uk")
 @Composable
 private fun ShoppingListEmptyPreview() {
     HomlyTheme {

@@ -140,7 +140,7 @@ private fun LoginContent(
     }
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, locale = "uk")
 @Composable
 private fun LoginContentPreview() {
     HomlyTheme {
@@ -154,7 +154,7 @@ private fun LoginContentPreview() {
     }
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, locale = "uk")
 @Composable
 private fun LoginContentWithErrorPreview() {
     HomlyTheme {

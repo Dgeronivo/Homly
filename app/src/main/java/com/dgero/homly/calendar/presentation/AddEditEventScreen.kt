@@ -260,7 +260,7 @@ private fun LocalDate.toEpochUtcMillis(): Long = atStartOfDay(ZoneOffset.UTC).to
 
 private fun Long.toLocalDateUtc(): LocalDate = Instant.ofEpochMilli(this).atZone(ZoneOffset.UTC).toLocalDate()
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, locale = "uk")
 @Composable
 private fun AddEditEventContentCreatePreview() {
     HomlyTheme {
@@ -277,7 +277,7 @@ private fun AddEditEventContentCreatePreview() {
     }
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, locale = "uk")
 @Composable
 private fun AddEditEventContentValidationErrorPreview() {
     HomlyTheme {

@@ -84,7 +84,7 @@ fun HomlyGridCard(
     }
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, locale = "uk")
 @Composable
 private fun HomlyHeroCardPreview() {
     HomlyTheme {
@@ -97,7 +97,7 @@ private fun HomlyHeroCardPreview() {
     }
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, locale = "uk")
 @Composable
 private fun HomlyGridCardPreview() {
     HomlyTheme {

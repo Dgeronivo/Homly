@@ -266,7 +266,7 @@ private fun TodayButton(onClick: () -> Unit) {
     }
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, locale = "uk")
 @Composable
 private fun TodayButtonPreview() {
     HomlyTheme {
@@ -274,7 +274,7 @@ private fun TodayButtonPreview() {
     }
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, locale = "uk")
 @Composable
 private fun MonthHeaderPreview() {
     HomlyTheme {
@@ -595,7 +595,7 @@ private fun buildMonthWeeks(yearMonth: YearMonth): List<List<LocalDate>> {
     return (0 until totalCells).map { gridStart.plusDays(it.toLong()) }.chunked(7)
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, locale = "uk")
 @Composable
 private fun CalendarContentPreview() {
     HomlyTheme {
@@ -644,7 +644,7 @@ private fun CalendarContentPreview() {
     }
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, locale = "uk")
 @Composable
 private fun CalendarContentEmptyDayPreview() {
     HomlyTheme {
@@ -661,7 +661,7 @@ private fun CalendarContentEmptyDayPreview() {
     }
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, locale = "uk")
 @Composable
 private fun MonthYearPickerDialogPreview() {
     HomlyTheme {
