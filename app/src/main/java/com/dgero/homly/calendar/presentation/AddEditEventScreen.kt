@@ -21,10 +21,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TimePicker
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberDatePickerState
-import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -37,6 +35,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.commandiron.wheel_picker_compose.WheelTimePicker
+import com.commandiron.wheel_picker_compose.core.TimeFormat
 import com.dgero.homly.R
 import com.dgero.homly.ui.theme.HomlyTheme
 import java.time.Instant
@@ -236,24 +236,38 @@ private fun EventTimePickerDialog(
     onConfirm: (LocalTime) -> Unit,
     onDismiss: () -> Unit,
 ) {
-    val state = rememberTimePickerState(
-        initialHour = initialTime.hour,
-        initialMinute = initialTime.minute,
-        is24Hour = true,
-    )
+    var selectedTime by remember { mutableStateOf(initialTime) }
 
     AlertDialog(
         onDismissRequest = onDismiss,
+        title = { Text(stringResource(R.string.select_time)) },
         confirmButton = {
-            TextButton(onClick = { onConfirm(LocalTime.of(state.hour, state.minute)) }) {
+            TextButton(onClick = { onConfirm(selectedTime) }) {
                 Text(stringResource(R.string.ok))
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel)) }
         },
-        text = { TimePicker(state = state) },
+        text = {
+            WheelTimePicker(
+                startTime = initialTime,
+                timeFormat = TimeFormat.HOUR_24,
+            ) { snappedTime -> selectedTime = snappedTime }
+        },
     )
+}
+
+@Preview(showBackground = true, locale = "uk")
+@Composable
+private fun EventTimePickerDialogPreview() {
+    HomlyTheme {
+        EventTimePickerDialog(
+            initialTime = LocalTime.of(9, 30),
+            onConfirm = {},
+            onDismiss = {},
+        )
+    }
 }
 
 private fun LocalDate.toEpochUtcMillis(): Long = atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli()

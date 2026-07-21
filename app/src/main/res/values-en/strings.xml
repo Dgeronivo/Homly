@@ -68,6 +68,7 @@
     <string name="save">Save</string>
     <string name="ok">OK</string>
     <string name="time_error">End time must be after start time</string>
+    <string name="select_time">Select time</string>
 
     <!-- Design Variations -->
     <string name="in_cart">In cart</string>

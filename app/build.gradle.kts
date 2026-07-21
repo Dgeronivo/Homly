@@ -59,6 +59,7 @@ dependencies {
     implementation(libs.androidx.room.ktx)
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.androidx.navigation.compose)
+    implementation(libs.wheel.picker.compose)
     ksp(libs.androidx.room.compiler)
 
     testImplementation(libs.junit)
